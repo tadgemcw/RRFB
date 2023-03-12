@@ -1,12 +1,14 @@
-library(usethis) ### for connecting with github
-library(gitcreds) ### for entering git token
+### connect to github
+library(usethis)
+library(gitcreds)
+create_github_token()
+gitcreds_set()
+
+### Main Project
 library(readxl)
 library(tidyverse)
 library(pander)
 
-### connect to github
-create_github_token()
-gitcreds_set()
 
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
@@ -23,6 +25,7 @@ carl_losses <- carl3 %>%
     group_by(geno) %>%
     summarize(net_loss = sum(n_outplanted - n_present)) %>%
     arrange(desc(net_loss))
+carl_losses
 
 ### Calculating weighted coral health
 carl_health <- carl3 %>%
@@ -42,13 +45,14 @@ carl_health <- carl3 %>%
                               (health_U99*.875) +
                               (health_100*1)/n_present))  %>%
   arrange(desc(weighted_health)) 
+carl_health
 
 ### Table of net losses and weighted health
-carl_losses %>%
+loss_health_table <- carl_losses %>%
   inner_join(carl_health, by = "geno") %>%
   select(geno, net_loss, weighted_health) %>%
-  arrange(desc(weighted_health)) %>%
-  print(n=22)
+  arrange(desc(weighted_health)) 
+loss_health_table
 
 
 
