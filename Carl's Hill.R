@@ -54,5 +54,21 @@ loss_health_table <- carl_losses %>%
   arrange(desc(weighted_health)) 
 loss_health_table
 
+### boxplots
 
+carl3 %>%
+  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  mutate(health_0 = sum(health_0, na.rm = TRUE), 
+            health_U25 = sum(health_q1, na.rm = TRUE), 
+            health_U50 = sum(health_q2, na.rm = TRUE),
+            health_U75 = sum(health_q3, na.rm = TRUE), 
+            health_U99 = sum(health_q4, na.rm = TRUE),
+            health_100 = sum(health_100, na.rm = TRUE)) %>%
+  mutate(weighted_health = ((health_0*0) +
+                              (health_U25*0.125) +
+                              (health_U50*.375) +
+                              (health_U75*.625) +
+                              (health_U99*.875) +
+                              (health_100*1)/n_present))
 
+ggplot(carl3, aes(x = factor(geno), y = perc_dead_tissue)) + geom_boxplot()
