@@ -23,11 +23,11 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
 ### Calculating net coral loss by geno
 carl_losses <- carl3 %>%
     group_by(geno) %>%
-    summarize(net_loss = sum(n_outplanted - n_present)) %>%
-    arrange(desc(net_loss))
+    summarize(mortality_rate = sum((n_outplanted - n_present) / n_outplanted)) %>%
+    arrange(desc(mortality_rate))
 carl_losses
 
-### Calculating weighted coral health
+### Calculating weighted coral health by geno
 carl_health <- carl3 %>%
   select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   group_by(geno) %>% 
@@ -38,37 +38,43 @@ carl_health <- carl3 %>%
             health_U75 = sum(health_q3, na.rm = TRUE), 
             health_U99 = sum(health_q4, na.rm = TRUE),
             health_100 = sum(health_100, na.rm = TRUE)) %>%
-  mutate(weighted_health = ((health_0*0) +
+  mutate(weighted_health = round(((health_0*0) +
                               (health_U25*0.125) +
                               (health_U50*.375) +
                               (health_U75*.625) +
                               (health_U99*.875) +
-                              (health_100*1)/n_present))  %>%
+                              (health_100*1)/n_present),2))  %>%
   arrange(desc(weighted_health)) 
 carl_health
 
-### Table of net losses and weighted health
+### Table of net losses and weighted health by geno
 loss_health_table <- carl_losses %>%
   inner_join(carl_health, by = "geno") %>%
-  select(geno, net_loss, weighted_health) %>%
+  select(geno, weighted_health, mortality_rate) %>%
   arrange(desc(weighted_health)) 
-loss_health_table
+print(loss_health_table, n = 22)
 
-### boxplots
-
-carl3 %>%
+### Creating column of weighted health of tissue.
+tissue_health <- carl3 %>%
   select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
-  mutate(health_0 = sum(health_0, na.rm = TRUE), 
-            health_U25 = sum(health_q1, na.rm = TRUE), 
-            health_U50 = sum(health_q2, na.rm = TRUE),
-            health_U75 = sum(health_q3, na.rm = TRUE), 
-            health_U99 = sum(health_q4, na.rm = TRUE),
-            health_100 = sum(health_100, na.rm = TRUE)) %>%
-  mutate(weighted_health = ((health_0*0) +
-                              (health_U25*0.125) +
-                              (health_U50*.375) +
-                              (health_U75*.625) +
-                              (health_U99*.875) +
-                              (health_100*1)/n_present))
+  rowwise() %>%
+  mutate(Health0 = sum(health_0, na.rm = TRUE),
+         Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health100 = sum(health_100, na.rm = TRUE),
+         weighted_health = sum(Health0 + Health25 + Health50 + Health75 + 
+                                 Health99 + Health100, na.rm = TRUE) / n_present)
+    
+### boxplot of tissue health by geno
+ggplot(tissue_health, aes(x = factor(geno), y = weighted_health)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0.5, 1.0)) +
+  labs(x = "Geno", y = "Tissue Health")
 
-ggplot(carl3, aes(x = factor(geno), y = perc_dead_tissue)) + geom_boxplot()
+### boxplot of tissue decay by geno
+ggplot(carl3, aes(x = factor(geno), y = perc_dead_tissue)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(-0.05, 1.1)) +
+  labs(x = "Geno", y = "Tissue Decay")
