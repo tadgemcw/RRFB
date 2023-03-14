@@ -30,33 +30,6 @@ carl_losses
 ### Calculating weighted coral health by geno
 carl_health <- carl3 %>%
   select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
-  group_by(geno) %>% 
-  summarize(n_present = sum(n_present, na.rm = TRUE),
-            health_0 = sum(health_0, na.rm = TRUE), 
-            health_U25 = sum(health_q1, na.rm = TRUE), 
-            health_U50 = sum(health_q2, na.rm = TRUE),
-            health_U75 = sum(health_q3, na.rm = TRUE), 
-            health_U99 = sum(health_q4, na.rm = TRUE),
-            health_100 = sum(health_100, na.rm = TRUE)) %>%
-  mutate(weighted_health = round(((health_0*0) +
-                              (health_U25*0.125) +
-                              (health_U50*.375) +
-                              (health_U75*.625) +
-                              (health_U99*.875) +
-                              (health_100*1)/n_present),2))  %>%
-  arrange(desc(weighted_health)) 
-carl_health
-
-### Table of net losses and weighted health by geno
-loss_health_table <- carl_losses %>%
-  inner_join(carl_health, by = "geno") %>%
-  select(geno, weighted_health, mortality_rate) %>%
-  arrange(desc(weighted_health)) 
-print(loss_health_table, n = 22)
-
-### Creating column of weighted health of tissue.
-tissue_health <- carl3 %>%
-  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -65,10 +38,24 @@ tissue_health <- carl3 %>%
          Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
          weighted_health = sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present)
+                           Health99 + Health100, na.rm = TRUE) / n_present) 
+
+carl_health_agg <- carl_health %>%
+  group_by(geno) %>%
+  summarize(avg_health = mean(weighted_health)) %>%
+  arrange(desc(avg_health))
+
+
+### Table of net losses and weighted health by geno
+loss_health_table <- carl_losses %>%
+  inner_join(carl_health_agg, by = "geno") %>%
+  select(geno, avg_health, mortality_rate) %>%
+  arrange(desc(avg_health)) 
+print(loss_health_table, n = 22)
+
     
 ### boxplot of tissue health by geno
-ggplot(tissue_health, aes(x = factor(geno), y = weighted_health)) + 
+ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0.5, 1.0)) +
   labs(x = "Geno", y = "Tissue Health")
