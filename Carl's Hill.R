@@ -20,12 +20,14 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
                                   "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
 
-### Calculating net coral loss by geno
+### Calculating coral losses by geno
 carl_losses <- carl3 %>%
-    group_by(geno) %>%
-    summarize(mortality_rate = sum((n_outplanted - n_present) / n_outplanted)) %>%
+    group_by(spieces, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = (num_outplanted - num_survived) / num_outplanted) %>%
     arrange(desc(mortality_rate))
-carl_losses
+print(carl_losses, n = 22)
 
 ### Calculating weighted coral health by geno
 carl_health <- carl3 %>%
@@ -49,7 +51,7 @@ carl_health_agg <- carl_health %>%
 ### Table of net losses and weighted health by geno
 loss_health_table <- carl_losses %>%
   inner_join(carl_health_agg, by = "geno") %>%
-  select(geno, avg_health, mortality_rate) %>%
+  select(spieces, geno, avg_health, mortality_rate) %>%
   arrange(desc(avg_health)) 
 print(loss_health_table, n = 22)
 
@@ -57,11 +59,11 @@ print(loss_health_table, n = 22)
 ### boxplot of tissue health by geno
 ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(0.5, 1.0)) +
-  labs(x = "Geno", y = "Tissue Health")
+  scale_y_continuous(limits = c(0.5, 1.0), breaks = seq(0.5, 1.0, by = 0.05)) +
+  labs(x = "Geno", y = "Percent of Healthy Tissue") 
 
 ### boxplot of tissue decay by geno
 ggplot(carl3, aes(x = factor(geno), y = perc_dead_tissue)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(-0.05, 1.1)) +
+  scale_y_continuous(limits = c(-0.05, 1.0)) +
   labs(x = "Geno", y = "Tissue Decay")
