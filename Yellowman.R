@@ -19,7 +19,7 @@ yellowman_losses3A <- yellowman3A %>%
   group_by(species, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present),
-            mortality_rate = (num_outplanted - num_survived) / num_outplanted) %>%
+            mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
   arrange(desc(mortality_rate))
 print(yellowman_losses3A, n = 100)
 
@@ -33,8 +33,8 @@ yellowman_health3A <- yellowman3A %>%
          Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
          Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present) 
+         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
+                                 Health99 + Health100, na.rm = TRUE) / n_present) * 100)
 
 yellowman_health_agg3A <- yellowman_health3A %>%
   group_by(geno) %>%
@@ -53,7 +53,7 @@ print(yellowman_loss_health_table3A, n = 100)
 ### boxplot of 3A tissue health by geno
 ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(0.35, 1.0), breaks = seq(0.35, 1.0, by = 0.05)) +
+  scale_y_continuous(limits = c(35, 100), breaks = seq(35, 100, by = 5)) +
   labs(x = "Acer Geno", 
        y = "Percent of Healthy Tissue",
        title = "Yellowman A",
@@ -67,7 +67,7 @@ yellowman_losses6A <- yellowman6A %>%
   group_by(species, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present),
-            mortality_rate = (num_outplanted - num_survived) / num_outplanted) %>%
+            mortality_rate = ((num_outplanted - num_survived) / num_outplanted)*100) %>%
   arrange(desc(mortality_rate))
 print(yellowman_losses6A, n = 100)
 
@@ -81,8 +81,8 @@ yellowman_health6A <- yellowman6A %>%
          Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
          Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present) 
+         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
+                                 Health99 + Health100, na.rm = TRUE) / n_present)*100)
 
 yellowman_health_agg6A <- yellowman_health6A %>%
   group_by(geno) %>%
@@ -100,7 +100,7 @@ print(yellowman_loss_health_table6A, n = 100)
 ### boxplot of 6A tissue health by geno
 ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(0.3, 1.0), breaks = seq(0.25, 1.0, by = 0.05)) +
+  scale_y_continuous(limits = c(30, 100), breaks = seq(25, 100, by = 5)) +
   labs(x = "Acer Geno", 
        y = "Percent of Healthy Tissue",
        title = "Yellowman A",
@@ -111,7 +111,7 @@ ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) +
 yellowmanA_spread <- yellowman_loss_health_table3A %>%
   left_join(yellowman_loss_health_table6A, 
             by = c("species", "geno"), suffix = c("3", "6")) %>%
-  mutate(perc_change = (avg_health6 - avg_health3) * 100) %>%
+  mutate(perc_change = avg_health6 - avg_health3) %>%
   arrange(desc(perc_change))
 print(yellowmanA_spread, n = 100)
 
@@ -124,8 +124,8 @@ yellowmanA_long <- yellowmanA_spread %>%
 ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
     geom_point(aes(color = survey_time)) +
     geom_line(aes(group = geno)) +
-    scale_y_continuous(limits = c(0, 1.0), 
-                       breaks = seq(0.45, 1.0, by = 0.05)) +
+    scale_y_continuous(limits = c(0, 100), 
+                       breaks = seq(45, 100, by = 5)) +
   scale_color_manual(labels = c("June 2021", "October 2021"), 
                        values = c("dodgerblue1", "magenta3")) +
     labs(x = "Acer Geno",
