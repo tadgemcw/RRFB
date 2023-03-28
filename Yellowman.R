@@ -1,7 +1,7 @@
 yellowman3A <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
                           sheet = 2, 
                           range = 'C2:Q136',
-                          col_names = c("date", "duration", "spieces", "geno", "cluster", 
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
                                         "n_outplanted","n_present", "n_lost", "health_0",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                         "pred_stressor"))
@@ -9,14 +9,14 @@ yellowman3A <- read_excel("Yellowman Acer Monitoring Database.xlsx",
 yellowman6A <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
                           sheet = 3, 
                           range = 'A2:P120',
-                          col_names = c("date", "duration", "spieces", "geno", "cluster", 
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
                                         "n_outplanted","n_present", "n_lost", "health_0",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                         "avg_health", "pred_stressor"))
 
 ### Calculating 3A coral losses by geno
 yellowman_losses3A <- yellowman3A %>%
-  group_by(spieces, geno) %>%
+  group_by(species, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present),
             mortality_rate = (num_outplanted - num_survived) / num_outplanted) %>%
@@ -45,7 +45,7 @@ yellowman_health_agg3A <- yellowman_health3A %>%
 ### Table of 3A net losses and weighted health by geno
 yellowman_loss_health_table3A <- yellowman_losses3A %>%
   inner_join(yellowman_health_agg3A, by = "geno") %>%
-  select(spieces, geno, avg_health, mortality_rate) %>%
+  select(species, geno, avg_health, mortality_rate) %>%
   arrange(desc(avg_health)) 
 print(yellowman_loss_health_table3A, n = 100)
 
@@ -64,7 +64,7 @@ ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) +
 
 ### Calculating 6A coral losses by geno
 yellowman_losses6A <- yellowman6A %>%
-  group_by(spieces, geno) %>%
+  group_by(species, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present),
             mortality_rate = (num_outplanted - num_survived) / num_outplanted) %>%
@@ -93,6 +93,45 @@ yellowman_health_agg6A <- yellowman_health6A %>%
 ### Table of 6A net losses and weighted health by geno
 yellowman_loss_health_table6A <- yellowman_losses6A %>%
   inner_join(yellowman_health_agg6A, by = "geno") %>%
-  select(spieces, geno, avg_health, mortality_rate) %>%
+  select(species, geno, avg_health, mortality_rate) %>%
   arrange(desc(avg_health)) 
 print(yellowman_loss_health_table6A, n = 100)
+
+### boxplot of 6A tissue health by geno
+ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0.3, 1.0), breaks = seq(0.25, 1.0, by = 0.05)) +
+  labs(x = "Acer Geno", 
+       y = "Percent of Healthy Tissue",
+       title = "Yellowman A",
+       subtitle = "6-Month Survey",
+       caption =  "Survey Date: 2021-10-12")
+
+#### Comparing A3 with A6
+yellowmanA_spread <- yellowman_loss_health_table3A %>%
+  left_join(yellowman_loss_health_table6A, 
+            by = c("species", "geno"), suffix = c("3", "6")) %>%
+  mutate(perc_change = (avg_health6 - avg_health3) * 100) %>%
+  arrange(desc(perc_change))
+print(yellowmanA_spread, n = 100)
+
+yellowmanA_long <- yellowmanA_spread %>% 
+  select(species, geno, avg_health3, avg_health6, perc_change) %>%
+  pivot_longer("avg_health3":"avg_health6", 
+                                   names_to = "survey_time",
+                                   values_to = "values")
+
+ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
+    geom_point(aes(color = survey_time)) +
+    geom_line(aes(group = geno)) +
+    scale_y_continuous(limits = c(0, 1.0), 
+                       breaks = seq(0.45, 1.0, by = 0.05)) +
+  scale_color_manual(labels = c("June 2021", "October 2021"), 
+                       values = c("dodgerblue1", "magenta3")) +
+    labs(x = "Acer Geno",
+         y = "Percent of Healthy Tissue",
+         color = "Survey",
+         legend = c("June 2021", "October 2021"),
+         title = "Yellowman A",
+         subtitle = "Average Change in Healthy Tissue") +
+    theme_light()
