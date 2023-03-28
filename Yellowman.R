@@ -101,7 +101,7 @@ print(yellowman_loss_health_table6A, n = 100)
 ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(30, 100), breaks = seq(25, 100, by = 5)) +
-  labs(x = "Acer Geno", 
+  labs(x = "Acer Genotypes", 
        y = "Percent of Healthy Tissue",
        title = "Yellowman A",
        subtitle = "6-Month Survey",
@@ -128,10 +128,10 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
                        breaks = seq(45, 100, by = 5)) +
   scale_color_manual(labels = c("June 2021", "October 2021"), 
                        values = c("dodgerblue1", "magenta3")) +
-    labs(x = "Acer Geno",
+    labs(x = "Acer Genotypes",
          y = "Percent of Healthy Tissue",
          color = "Survey",
          legend = c("June 2021", "October 2021"),
-         title = "Yellowman A",
-         subtitle = "Average Change in Healthy Tissue") +
+         title = "Yellowman: Average Change in Tissue Health",
+         subtitle = "Area A") +
     theme_light()
