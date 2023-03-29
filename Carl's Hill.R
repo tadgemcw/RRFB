@@ -1,14 +1,6 @@
-### connect to github
-library(usethis)
-library(gitcreds)
-create_github_token()
-gitcreds_set()
-
-### Main Project
 library(readxl)
 library(tidyverse)
 library(pander)
-
 
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
