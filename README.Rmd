@@ -1,0 +1,38 @@
+---
+title: "README"
+author: "Tadge McWilliams"
+date: "2023-03-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(pander)
+```
+
+```{r}
+setwd("~/Documents/Data Science/Reef Renewal Bonaire")
+carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
+                    sheet = 2, 
+                    range = 'A2:Y86',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+```
+
+```{r}
+### Calculating coral losses by geno
+carl_losses <- carl3 %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
+    arrange(desc(mortality_rate))
+
+carl_losses$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
+carl_losses %>% pander()
+```
+
