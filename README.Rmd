@@ -1,8 +1,12 @@
 ---
-title: "Anlysis of Bonaire Reef Renewal Foundation Outplantings"
+title: "Analysis of Reef Restoration:"
+subtitle: "A Collaboration with Bonaire Reef Renewal Foundation"
 author: "Tadge McWilliams"
 date: "2023-03-30"
-output: html_document
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
 ---
 
 ```{r, load libraries, include=FALSE, echo=FALSE}
@@ -11,6 +15,9 @@ library(tidyverse)
 library(pander)
 ```
 
+
+### Carl's Hill
+The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting at Carl's Hill.  Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused when more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted geno or a survey error.
 ```{r, importing data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
@@ -23,6 +30,7 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
 ```
 
+*Ranking Genotypes by Mortality Rate*
 ```{r, calculating coral losses by geno, echo=FALSE, message=FALSE}
 carl_losses <- carl3 %>%
     group_by(species, geno) %>%
@@ -32,9 +40,15 @@ carl_losses <- carl3 %>%
     arrange(desc(mortality_rate))
 
 carl_losses$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
-carl_losses %>% pander()
+carl_losses %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate) %>%
+  pander()
 ```
 
+*Ranking Genotypes by Average Tissue Health*
 ```{r, calculating weighted coral health by geno, echo=FALSE}
 carl_health <- carl3 %>%
   select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -60,17 +74,22 @@ loss_health_table <- carl_losses %>%
   select(species, geno, avg_health, mortality_rate) %>%
   arrange(desc(avg_health)) 
 loss_health_table$avg_health <- paste0(round(loss_health_table$avg_health, 2), "%")
-pander(loss_health_table)
+loss_health_table %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "Avg. Health" = avg_health, 
+                       "Mortality Rate" = mortality_rate) %>% 
+  pander()
 ```
 
+
+The plot below identifies the range of tissue health by genotype.  
 ```{r, boxplot of tissue health by geno, echo=FALSE}
 ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(50, 100), breaks = seq(50, 100, by = 5)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
-       title = "Carl's Hill",
-       subtitle = "3-Month Survey",
-       caption = "Survey Date: 2022-04-27")
+       title = "Carl's Hill 3-Month Survey",
+       caption = "Adj. Survey Date: 2022-04-27")
 ```
 
