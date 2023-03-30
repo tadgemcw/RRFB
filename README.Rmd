@@ -1,17 +1,17 @@
 ---
-title: "README"
+title: "Anlysis of Bonaire Reef Renewal Foundation Outplantings"
 author: "Tadge McWilliams"
 date: "2023-03-30"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r, load libraries, include=FALSE, echo=FALSE}
 library(readxl)
 library(tidyverse)
 library(pander)
 ```
 
-```{r}
+```{r, importing data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
                     sheet = 2, 
@@ -23,8 +23,7 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
 ```
 
-```{r}
-### Calculating coral losses by geno
+```{r, calculating coral losses by geno, echo=FALSE, message=FALSE}
 carl_losses <- carl3 %>%
     group_by(species, geno) %>%
     summarize(num_outplanted = sum(n_outplanted),
@@ -34,5 +33,44 @@ carl_losses <- carl3 %>%
 
 carl_losses$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
 carl_losses %>% pander()
+```
+
+```{r, calculating weighted coral health by geno, echo=FALSE}
+carl_health <- carl3 %>%
+  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  rowwise() %>%
+  mutate(Health0 = sum(health_0, na.rm = TRUE),
+         Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health100 = sum(health_100, na.rm = TRUE),
+         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
+                           Health99 + Health100, na.rm = TRUE) / n_present) * 100) 
+
+carl_health_agg <- carl_health %>%
+  group_by(geno) %>%
+  summarize(avg_health = mean(weighted_health)) %>%
+  arrange(desc(avg_health))
+
+
+### Table of net losses and weighted health by geno
+loss_health_table <- carl_losses %>%
+  inner_join(carl_health_agg, by = "geno") %>%
+  select(species, geno, avg_health, mortality_rate) %>%
+  arrange(desc(avg_health)) 
+loss_health_table$avg_health <- paste0(round(loss_health_table$avg_health, 2), "%")
+pander(loss_health_table)
+```
+
+```{r, boxplot of tissue health by geno, echo=FALSE}
+ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(50, 100), breaks = seq(50, 100, by = 5)) +
+  labs(x = "Apal Genotype", 
+       y = "Percent of Healthy Tissue",
+       title = "Carl's Hill",
+       subtitle = "3-Month Survey",
+       caption = "Survey Date: 2022-04-27")
 ```
 
