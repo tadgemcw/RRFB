@@ -21,6 +21,10 @@ carl_losses <- carl3 %>%
     arrange(desc(mortality_rate))
 print(carl_losses, n = 22)
 
+carl_losses_formatted <- carl_losses
+carl_losses_formatted$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
+carl_losses_formatted %>% pander()
+
 ### Calculating weighted coral health by geno
 carl_health <- carl3 %>%
   select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
