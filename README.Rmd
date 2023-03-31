@@ -14,10 +14,12 @@ library(readxl)
 library(tidyverse)
 library(pander)
 ```
-
+The goal of this project is to aid the Bonaire Reef Renewal Foundation in developing a successful, data driven program through which to outplant new, "reef-ready" corals.  By analyzing the survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of each genotype and the overall changes in the ecological footprints of the outplanting locations.
 
 ### Carl's Hill
-The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting at Carl's Hill.  Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused when more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted geno or a survey error.
+The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of new, "reef-ready" corals at Carl's Hill.  
+Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused when more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted corals or a survey error.
+
 ```{r, importing data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
@@ -47,6 +49,8 @@ carl_losses %>% rename("Species" = species,
                        "Mortality Rate" = mortality_rate) %>%
   pander()
 ```
+
+Another feature of the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors can be detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that weighted average of tissue health does include the observations that were pronounced dead.  Therefore, the average health of each geno takes into account the mortality rate of that geno as well as the average health of the living observations.
 
 *Ranking Genotypes by Average Tissue Health*
 ```{r, calculating weighted coral health by geno, echo=FALSE}
@@ -82,7 +86,7 @@ loss_health_table %>% rename("Species" = species,
 ```
 
 
-The plot below identifies the range of tissue health by genotype.  
+Outliers can easily skew the averages of any aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #5, and #9 are slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
 ```{r, boxplot of tissue health by geno, echo=FALSE}
 ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
