@@ -100,6 +100,24 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
        caption = "Adj. Survey Date: 2022-04-27")
 ```
 
+Actionable Opportunities:
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation.  Bottom contract--a stressor caused from agitation against the seafloor--is typically when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with stronger adhesives.   
+
+```{r, bottom stressor proportion, echo=FALSE}
+bottom_perc <- carl3 %>%
+  summarize(Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
+            Total_Stressors = sum(n_stressors, na.rm = TRUE),
+            Percent_of_Total = (sum(carl3$bottom_contact, na.rm = TRUE) / 
+                sum(carl3$n_stressors, na.rm = TRUE) * 100))
+
+bottom_perc$Percent_of_Total <-paste0(round(bottom_perc$Percent_of_Total, 2), "%")
+bottom_perc %>% rename("Bottom Contact" = Bottom_Contact,
+                       "Total Stressors" = Total_Stressors,
+                       "Precent of Total" = Percent_of_Total) %>%
+  pander()
+```
+
+
 ## Yellowman
 Copy 
 

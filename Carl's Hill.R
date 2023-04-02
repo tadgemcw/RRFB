@@ -21,9 +21,8 @@ carl_losses <- carl3 %>%
     arrange(desc(mortality_rate))
 print(carl_losses, n = 22)
 
-carl_losses_formatted <- carl_losses
-carl_losses_formatted$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
-carl_losses_formatted %>% pander()
+carl_losses$mortality_rate <- paste0(round(carl_losses$mortality_rate, 2), "%")
+carl_losses %>% pander()
 
 ### Calculating weighted coral health by geno
 carl_health <- carl3 %>%
@@ -49,7 +48,8 @@ loss_health_table <- carl_losses %>%
   inner_join(carl_health_agg, by = "geno") %>%
   select(species, geno, avg_health, mortality_rate) %>%
   arrange(desc(avg_health)) 
-print(loss_health_table, n = 22)
+loss_health_table$avg_health <- paste0(round(loss_health_table$avg_health, 2), "%")
+pander(loss_health_table)
 
     
 ### boxplot of tissue health by geno
@@ -71,4 +71,5 @@ ggplot(carl3, aes(x = factor(geno), y = (perc_dead_tissue * 100))) +
        title = "Carl's Hill",
        subtitle = "3-Month Survey",
        caption =  "Survey Date: 2022-04-27")
+
 
