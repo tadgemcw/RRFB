@@ -1,8 +1,8 @@
 ---
-title: "Analysis of Reef Restoration:"
-subtitle: "A Collaboration with Bonaire Reef Renewal Foundation"
+title: "Choosing the Right Corals:"
+subtitle: "An Analysis of Coral Genotypes with Bonaire Reef Renewal Foundation"
 author: "Tadge McWilliams"
-date: "2023-03-30"
+date: "2023-04-05"
 output: 
   html_document:
     toc: TRUE
@@ -15,12 +15,12 @@ library(readxl)
 library(tidyverse)
 library(pander)
 ```
-The goal of this project is to aid the Bonaire Reef Renewal Foundation in developing a successful, data driven program through which to efficiently introduce new, "reef-ready" corals into the Bonaire reef systems.  By analyzing the survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of each genotype and the overall changes in the ecological footprints of the outplanting locations.
+The goal of this project is to aid the Bonaire Reef Renewal Foundation in developing a successful, data driven program through which to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing the survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of each genotype and the overall changes in the ecological footprints of the outplanting locations.
 
 ## Carl's Hill
 
-The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of new, "reef-ready" corals at Carl's Hill.  
-Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused when more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted corals or a survey error.
+The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  
+Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted corals or a survey error.
 
 ```{r, carls hill data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
@@ -52,7 +52,7 @@ carl_losses %>% rename("Species" = species,
   pander()
 ```
 
-Another feature of the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors can be detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that weighted average of tissue health does include the observations that were pronounced dead.  Therefore, the average health of each geno takes into account the mortality rate of that geno as well as the average health of the living observations.  
+Another feature of the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors can be detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that the weighted average of tissue health does include observations that were pronounced dead.  Therefore, the average health of each geno takes into account the mortality rate of that geno as well as the average health of the living observations.  
 
 *Ranking Genotypes by Average Tissue Health*
 ```{r, carls hill calculating weighted coral health by geno, echo=FALSE}
@@ -101,28 +101,30 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
 ```
 
 Actionable Opportunities:
-There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation.  Bottom contract--a stressor caused from agitation against the seafloor--is typically when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with stronger adhesives.   
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation's efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations going forward.
 
 ```{r, bottom stressor proportion, echo=FALSE}
 bottom_perc <- carl3 %>%
-  summarize(Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
+  summarize(N_Outplanted = n(),
             Total_Stressors = sum(n_stressors, na.rm = TRUE),
+            Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
             Percent_of_Total = (sum(carl3$bottom_contact, na.rm = TRUE) / 
                 sum(carl3$n_stressors, na.rm = TRUE) * 100))
 
 bottom_perc$Percent_of_Total <-paste0(round(bottom_perc$Percent_of_Total, 2), "%")
-bottom_perc %>% rename("Bottom Contact" = Bottom_Contact,
+bottom_perc %>% rename("# Outplanted" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
+                        "Bottom Contact" = Bottom_Contact,
                        "Precent of Total" = Percent_of_Total) %>%
   pander()
 ```
 
 
 ## Yellowman
-Copy 
+The following data has been taken from surveys conducted across the Yellowman restoration locations.  Within the location, there are A, B, and C sub-locations.
 
 ### Yellowman A
-Yellow man A copy.
+
 ```{r, yellowman data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 yellowman3A <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -141,6 +143,7 @@ yellowman6A <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                         "avg_health", "pred_stressor"))
 ```
+The Acer species appears to be more successful than the Apal.  Over 700 more corals were outplanted at Yellowman A than at Carl's Hill with 11 fewer fatalities.  Additional factors beyond species are likely to contribute to these statistics; however, it is worth noting that the two locations are geographically quite close to each other.  Yellowman would be subject to much of the same weather conditions as Carl's Hill.
 
 *3-Month Survey: Ranking Genotypes by Mortality Rate*
 ```{r yellowman3 calculating coral losses by geno, echo=FALSE, message=FALSE}
@@ -159,6 +162,7 @@ yellowman_losses3A %>% rename("Species" = species,
                        "Mortality Rate" = mortality_rate) %>%
   pander()
 ```
+While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos 14, #21, and #22 notabely less successful than #17-#20.  
 
 *Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman3A calculating 3A weighted coral health by geno, echo=FALSE }
@@ -192,7 +196,8 @@ yellowman_loss_health_table3A %>% rename("Species" = species,
   pander()
 ```
 
-The plot below identifies the range of tissue health by genotype
+The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
+
 ```{r, yellowman3A boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
