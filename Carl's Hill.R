@@ -76,14 +76,16 @@ ggplot(carl3, aes(x = factor(geno), y = (perc_dead_tissue * 100))) +
 #### Bottom stressors
 
 bottom_perc <- carl3 %>%
-  summarize(Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
+  summarize(N_Outplanted = n(),
             Total_Stressors = sum(n_stressors, na.rm = TRUE),
+            Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
             Percent_of_Total = (sum(carl3$bottom_contact, na.rm = TRUE) / 
                 sum(carl3$n_stressors, na.rm = TRUE) * 100))
 
 bottom_perc$Percent_of_Total <-paste0(round(bottom_perc$Percent_of_Total, 2), "%")
-bottom_perc %>% rename("Bottom Contact" = Bottom_Contact,
+bottom_perc %>% rename("Coral Observations" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
-                       "Precent of Total" = Percent_of_Total) %>%
+                        "Bottom Contact" = Bottom_Contact,
+                       "Precent of Total Stressors" = Percent_of_Total) %>%
   pander()
 

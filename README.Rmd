@@ -52,7 +52,9 @@ carl_losses %>% rename("Species" = species,
   pander()
 ```
 
-Another feature of the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors can be detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that the weighted average of tissue health does include observations that were pronounced dead.  Therefore, the average health of each geno takes into account the mortality rate of that geno as well as the average health of the living observations.  
+Another feature of the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors can be detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that the weighted average of tissue health does not include observations that were pronounced dead. [^1]
+
+[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral reef restoration monitoring guide: Methods to evaluate restoration success from local to ecosystem scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
 *Ranking Genotypes by Average Tissue Health*
 ```{r, carls hill calculating weighted coral health by geno, echo=FALSE}
@@ -61,12 +63,12 @@ carl_health <- carl3 %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
-         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
-         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
-         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
-                           Health99 + Health100, na.rm = TRUE) / n_present) * 100) 
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                           Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) 
 
 carl_health_agg <- carl_health %>%
   group_by(geno) %>%
@@ -171,12 +173,12 @@ yellowman_health3A <- yellowman3A %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
-         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
-         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
-         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present) * 100)
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                           Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) 
 
 yellowman_health_agg3A <- yellowman_health3A %>%
   group_by(geno) %>%
