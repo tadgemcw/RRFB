@@ -29,12 +29,13 @@ yellowman_health3A <- yellowman3A %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
-         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
-         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
-         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present) * 100)
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
 
 yellowman_health_agg3A <- yellowman_health3A %>%
   group_by(geno) %>%
@@ -77,12 +78,13 @@ yellowman_health6A <- yellowman6A %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
-         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
-         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
-         Health99 = sum(health_q4 * 0.875, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
-         weighted_health = (sum(Health0 + Health25 + Health50 + Health75 + 
-                                 Health99 + Health100, na.rm = TRUE) / n_present)*100)
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
 
 yellowman_health_agg6A <- yellowman_health6A %>%
   group_by(geno) %>%
@@ -100,7 +102,7 @@ print(yellowman_loss_health_table6A, n = 100)
 ### boxplot of 6A tissue health by geno
 ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(30, 100), breaks = seq(25, 100, by = 5)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotypes", 
        y = "Percent of Healthy Tissue",
        title = "Yellowman A",

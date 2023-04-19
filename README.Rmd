@@ -1,6 +1,6 @@
 ---
-title: "Choosing the Right Corals:"
-subtitle: "An Analysis of Coral Genotypes with Bonaire Reef Renewal Foundation"
+title: "Analysis of Coral Restoration on Bonaire"
+subtitle: "In Collaboration with Bonaire Reef Renewal Foundation"
 author: "Tadge McWilliams"
 date: "2023-04-05"
 output: 
@@ -17,7 +17,9 @@ library(pander)
 ```
 The goal of this project is to aid the Bonaire Reef Renewal Foundation in developing a successful, data driven program through which to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing the survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of each genotype and the overall changes in the ecological footprints of the outplanting locations.
 
-## Carl's Hill
+## Apal
+
+### Carl's Hill
 
 The summary statistics below were generated from a survey of coral growth between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  
 Geno #16 and geno #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted corals or a survey error.
@@ -68,7 +70,8 @@ carl_health <- carl3 %>%
          Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
          weighted_health = (sum(Health25 + Health50 + Health75 + 
-                           Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
 
 carl_health_agg <- carl_health %>%
   group_by(geno) %>%
@@ -90,21 +93,22 @@ loss_health_table %>% rename("Species" = species,
 ```
 
 
-Outliers can easily skew the averages of any aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #5, and #9 is slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
+Outliers can easily skew the averages of an aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #9, and #21 is slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
 
 ```{r, carls hill boxplot of tissue health by geno, echo=FALSE}
 ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(35, 100), breaks = seq(35, 100, by = 5)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
        title = "Carl's Hill 3-Month Survey",
        caption = "Adj. Survey Date: 2022-04-27")
 ```
 
-Actionable Opportunities:
-There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation's efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations going forward.
+**Actionable Opportunities:**
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation's efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations after future outplantings.
 
+*Carl's Hill*
 ```{r, bottom stressor proportion, echo=FALSE}
 bottom_perc <- carl3 %>%
   summarize(N_Outplanted = n(),
@@ -122,8 +126,8 @@ bottom_perc %>% rename("# Outplanted" = N_Outplanted,
 ```
 
 
-## Yellowman
-The following data has been taken from surveys conducted across the Yellowman restoration locations.  Within the location, there are A, B, and C sub-locations.
+## Acer
+The Acer species appears to be more successful than the Apal.  Over 700 more corals were outplanted at Yellowman A than at Carl's Hill with 11 fewer fatalities.  Additional factors beyond species are likely to contribute to these statistics; however, it is worth noting that the two locations are geographically quite close to each other.  Yellowman would be subject to much of the same weather conditions as Carl's Hill.
 
 ### Yellowman A
 
@@ -145,7 +149,8 @@ yellowman6A <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                         "avg_health", "pred_stressor"))
 ```
-The Acer species appears to be more successful than the Apal.  Over 700 more corals were outplanted at Yellowman A than at Carl's Hill with 11 fewer fatalities.  Additional factors beyond species are likely to contribute to these statistics; however, it is worth noting that the two locations are geographically quite close to each other.  Yellowman would be subject to much of the same weather conditions as Carl's Hill.
+
+The following data has been taken from surveys conducted across the Yellowman restoration locations.  Within the location, there are A, B, and C sub-locations.
 
 *3-Month Survey: Ranking Genotypes by Mortality Rate*
 ```{r yellowman3 calculating coral losses by geno, echo=FALSE, message=FALSE}
@@ -164,7 +169,7 @@ yellowman_losses3A %>% rename("Species" = species,
                        "Mortality Rate" = mortality_rate) %>%
   pander()
 ```
-While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos 14, #21, and #22 notabely less successful than #17-#20.  
+While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos #14, #21, and #22 notably less successful than #17-#20.  
 
 *Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman3A calculating 3A weighted coral health by geno, echo=FALSE }
@@ -178,7 +183,8 @@ yellowman_health3A <- yellowman3A %>%
          Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
          Health100 = sum(health_100, na.rm = TRUE),
          weighted_health = (sum(Health25 + Health50 + Health75 + 
-                           Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
 
 yellowman_health_agg3A <- yellowman_health3A %>%
   group_by(geno) %>%
@@ -203,7 +209,7 @@ The plot below identifies the range of tissue health by genotype.  Few outliers 
 ```{r, yellowman3A boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
-  scale_y_continuous(limits = c(35, 100), breaks = seq(35, 100, by = 5)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        title = "Yellowman A",
