@@ -173,7 +173,7 @@ carl_long <- carl_spread %>%
 
 ggplot(carl_long, aes(x = factor(geno), y = values)) +
   geom_point(aes(color = survey_time)) +
-  geom_line(aes(group = geno)) +
+  geom_line(arrow = arrow(length=unit(0.20,"cm"), ends="last", type = "open")) +
   scale_y_continuous(limits = c(0, 100), 
                      breaks = seq(0, 100, by = 5)) +
   scale_color_manual(labels = c("April 2022", "July 2022"), 
@@ -185,7 +185,7 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
   theme_light()
 
 
-
+  geom_line(aes(group = geno)) +
 #### Bottom stressors 3 month
 
 bottom_perc <- carl3 %>%
