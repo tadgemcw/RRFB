@@ -313,7 +313,7 @@ ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) +
 Yellowman B Copy
 
 ## Actionable Opportunities
-There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially desease and predation, are out of the control of the foundation's efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during tropical storms or wind-reversals, there is an opportunity reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations after future outplantings.
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially disease and predation, are out of the control of restoration efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations across future outplanting sites if new technologies improve.
 
 *Carl's Hill 3-Month Survey*
 ```{r, bottom stressor proportion, echo=FALSE}
