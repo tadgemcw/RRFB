@@ -315,19 +315,53 @@ Yellowman B Copy
 ## Actionable Opportunities
 There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially disease and predation, are out of the control of restoration efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations across future outplanting sites if new technologies improve.
 
-*Carl's Hill 3-Month Survey*
-```{r, bottom stressor proportion, echo=FALSE}
-bottom_perc <- carl3 %>%
+**Carl's Hill 3-Month Survey**
+```{r, carl 3 bottom stressor proportion, echo=FALSE}
+c3bottom_perc <- carl3 %>%
   summarize(N_Outplanted = n(),
             Total_Stressors = sum(n_stressors, na.rm = TRUE),
             Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
             Percent_of_Total = (sum(carl3$bottom_contact, na.rm = TRUE) / 
                 sum(carl3$n_stressors, na.rm = TRUE) * 100))
 
-bottom_perc$Percent_of_Total <-paste0(round(bottom_perc$Percent_of_Total, 2), "%")
-bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+c3bottom_perc$Percent_of_Total <-paste0(round(c3bottom_perc$Percent_of_Total, 2), "%")
+c3bottom_perc %>% rename("# Outplanted" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Precent of Total" = Percent_of_Total) %>%
   pander()
 ```
+
+**Carl's Hill 6-Month Survey**
+```{r carl 6 bottom stressor proportion, echo=FALSE}
+c6bottom_perc <- carl6 %>%
+  summarize(N_Outplanted = n(),
+            Total_Stressors = sum(n_stressors, na.rm = TRUE),
+            Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
+            Percent_of_Total = (sum(carl6$bottom_contact, na.rm = TRUE) / 
+                sum(carl6$n_stressors, na.rm = TRUE) * 100))
+
+c6bottom_perc$Percent_of_Total <-paste0(round(c6bottom_perc$Percent_of_Total, 2), "%")
+c6bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+                       "Total Stressors" = Total_Stressors,
+                        "Bottom Contact" = Bottom_Contact,
+                       "Precent of Total" = Percent_of_Total) %>%
+  pander()
+```
+**Yellowman B 3-Month Survey**
+```{r}
+yb3bottom_perc <- yellowman3B %>%
+  summarize(N_Outplanted = n(),
+            Total_Stressors = sum(n_stressors, na.rm = TRUE),
+            Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
+            Percent_of_Total = (sum(yellowman3B$bottom_contact, na.rm = TRUE) / 
+                sum(yellowman3B$n_stressors, na.rm = TRUE) * 100))
+
+yb3bottom_perc$Percent_of_Total <-paste0(round(ya3bottom_perc$Percent_of_Total, 2), "%")
+yb3bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+                       "Total Stressors" = Total_Stressors,
+                        "Bottom Contact" = Bottom_Contact,
+                       "Precent of Total" = Percent_of_Total) %>%
+  pander()
+```
+
