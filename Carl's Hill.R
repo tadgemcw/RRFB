@@ -163,7 +163,6 @@ carl_spread <- carl3_loss_health_table %>%
             by = c("species", "geno"), suffix = c("3", "6")) %>%
   mutate(perc_change = avg_health6 - avg_health3) %>%
   arrange(desc(perc_change))
-print(carl_spread, n = 100)
 
 carl_long <- carl_spread %>% 
   select(species, geno, avg_health3, avg_health6, perc_change) %>%
@@ -173,7 +172,7 @@ carl_long <- carl_spread %>%
 
 ggplot(carl_long, aes(x = factor(geno), y = values)) +
   geom_point(aes(color = survey_time)) +
-  geom_line(arrow = arrow(length=unit(0.20,"cm"), ends="last", type = "open")) +
+  geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open")) +
   scale_y_continuous(limits = c(0, 100), 
                      breaks = seq(0, 100, by = 5)) +
   scale_color_manual(labels = c("April 2022", "July 2022"), 
@@ -185,7 +184,7 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
   theme_light()
 
 
-  geom_line(aes(group = geno)) +
+
 #### Bottom stressors 3 month
 
 bottom_perc <- carl3 %>%
