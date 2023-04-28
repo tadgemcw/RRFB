@@ -348,7 +348,7 @@ c3bottom_perc <- carl3 %>%
                 sum(carl3$n_stressors, na.rm = TRUE) * 100))
 
 c3bottom_perc$Percent_of_Total <-paste0(round(c3bottom_perc$Percent_of_Total, 2), "%")
-c3bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+c3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Precent of Total" = Percent_of_Total) %>%
@@ -365,7 +365,7 @@ c6bottom_perc <- carl6 %>%
                 sum(carl6$n_stressors, na.rm = TRUE) * 100))
 
 c6bottom_perc$Percent_of_Total <-paste0(round(c6bottom_perc$Percent_of_Total, 2), "%")
-c6bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Precent of Total" = Percent_of_Total) %>%
@@ -381,7 +381,7 @@ yb3bottom_perc <- yellowman3B %>%
                 sum(yellowman3B$n_stressors, na.rm = TRUE) * 100))
 
 yb3bottom_perc$Percent_of_Total <-paste0(round(yb3bottom_perc$Percent_of_Total, 2), "%")
-yb3bottom_perc %>% rename("# Outplanted" = N_Outplanted,
+yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Precent of Total" = Percent_of_Total) %>%
