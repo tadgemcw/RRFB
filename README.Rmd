@@ -138,7 +138,12 @@ carl6_losses <- carl6 %>%
 
 carl6_losses_pretty <- carl6_losses
 carl6_losses_pretty$mortality_rate <- paste0(round(carl6_losses_pretty$mortality_rate, 2), "%")
-carl6_losses_pretty %>% pander()
+carl6_losses_pretty%>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate) %>%
+  pander()
 ```
 
 **Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health**
@@ -173,7 +178,11 @@ carl6_loss_health_table <- carl6_losses %>%
 carl6_loss_health_table_pretty <- carl6_loss_health_table
 carl6_loss_health_table_pretty$avg_health <- paste0(round(carl6_loss_health_table_pretty$avg_health, 2), "%")
 carl6_loss_health_table_pretty$mortality_rate <- paste0(round(carl6_loss_health_table_pretty$mortality_rate, 2), "%")
-pander(carl6_loss_health_table_pretty)
+carl6_loss_health_table_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "Avg. Health" = avg_health, 
+                       "Mortality Rate" = mortality_rate) %>% 
+pander()
 ```
 
 
@@ -296,8 +305,9 @@ yellowman_loss_health_table3A %>% rename("Species" = species,
   pander()
 ```
 
-The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
+The plot below identifies the range of tissue health by genotype.  The presence of a few outliers help to confirm the average health statistics are representative of each geno's viability.
 
+**Yellowman-A 3-Month Survey: Average Tissue Health Variance**
 ```{r, yellowman3A boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
@@ -309,8 +319,21 @@ ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2021-06-23")
 ```
 
-### Yellowman B
+### Yellowman B Location
 Yellowman B Copy
+```{r yellowman B, echo=FALSE}
+setwd("~/Documents/Data Science/Reef Renewal Bonaire")
+yellowman3B <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 4, 
+                    range = 'A2:Y83',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+```
+
+
 
 ## Actionable Opportunities
 There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially disease and predation, are out of the control of restoration efforts.  Bottom contract--a stressor caused from agitation against the seafloor--typically occurs when corals break free from their placements.  While this is unavoidable during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contract events with improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  It will be interesting to compare the percentage of Bottom Contact observations across future outplanting sites if new technologies improve.
@@ -348,8 +371,8 @@ c6bottom_perc %>% rename("# Outplanted" = N_Outplanted,
                        "Precent of Total" = Percent_of_Total) %>%
   pander()
 ```
-**Yellowman B 3-Month Survey**
-```{r}
+**Yellowman-B 3-Month Survey**
+```{r opportunities yellowmanB3 bottom contact, echo=FALSE}
 yb3bottom_perc <- yellowman3B %>%
   summarize(N_Outplanted = n(),
             Total_Stressors = sum(n_stressors, na.rm = TRUE),
@@ -357,7 +380,7 @@ yb3bottom_perc <- yellowman3B %>%
             Percent_of_Total = (sum(yellowman3B$bottom_contact, na.rm = TRUE) / 
                 sum(yellowman3B$n_stressors, na.rm = TRUE) * 100))
 
-yb3bottom_perc$Percent_of_Total <-paste0(round(ya3bottom_perc$Percent_of_Total, 2), "%")
+yb3bottom_perc$Percent_of_Total <-paste0(round(yb3bottom_perc$Percent_of_Total, 2), "%")
 yb3bottom_perc %>% rename("# Outplanted" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
