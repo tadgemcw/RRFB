@@ -100,6 +100,14 @@ yellowmanC3 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                   "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", "bottom_contact", 
                                   "fireworm", "snail", "cyanob", "competition", "unknown", "n_stressors"))
 
+###Monitoring Summary
+ltsummary <- read_excel("Monitoring Summary.xlsx", 
+                    sheet = 4, 
+                    range = 'A2:N24',
+                    col_names = c("site_name", "site_code", "species", "op_date", "subsite", 
+                                  "survey_date","duration", "time_code", "eco_footprint",
+                                  "tot_coral_area", "restored_area", "perc_coral_cover", 
+                                  "coral_density", "restored_size_cm"))
 ```
 
 
