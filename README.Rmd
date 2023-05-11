@@ -546,6 +546,38 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
 pander()
 ```
 
+**Yellowman C 3-Month Survey: Average Tissue Health Variance**
+```{r yellowmanB6 boxplot of tissue health by geno, echo=FALSE}
+ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Acer Genotype", 
+       y = "Percent of Healthy Tissue",
+       caption =  "Adj. Survey Date: 2022-11-12")
+```
+
+**Comparing Average Tissue Health Between Acer Sites**
+```{r Comparing YellowmanA 3 with Yellowman C 3, echo=FALSE}
+yellowmanA3C3_health <- yellowmanA3_health %>%
+                            mutate(location = "yellowmanA") %>%
+                            bind_rows(yellowmanC3_health)
+yellowmanA3C3_health <- yellowmanA3C3_health %>% replace_na(list(location = 'yellowmanC'))
+
+ggplot(yellowmanA3C3_health, aes(x = factor(geno), y = weighted_health, color = location)) + 
+  geom_point() +
+  scale_color_discrete(labels = c("Yellowman A", "Yellowman C")) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Acer Genotype", 
+       y = "Percent of Healthy Tissue",
+       color = "Location") 
+
+
+ 
+                    
+ 
+```
+
+
 ## Ecological Footprint
 
 Provide change in ecological footprint from outplant plot (page 25-26).
