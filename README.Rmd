@@ -28,8 +28,10 @@ Apart from the mortality rate, an important universal metric included in the sur
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
 
-```{r, carls hill 3 data, echo=FALSE}
+```{r, loading data, echo=FALSE}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
+
+### Carl 3-Month Survey
 carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
                     sheet = 2, 
                     range = 'A2:Y86',
@@ -38,25 +40,68 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
                                   "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+### Carl 6-Month Survey
+carl6 <- read_excel("Carls Hill Monitoring Database.xlsx", 
+                    sheet = 3, 
+                    range = 'A2:Z51',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
+                                  "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cyanob", "sedimentation", "unknown", "n_stressors"))
+
+### Yellowman A 3-Month Survey
+yellowmanA3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q136',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                        "n_outplanted","n_present", "n_lost", "health_0",
+                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                        "pred_stressor"))
+
+### Yellowman A 6-Month Survey
+yellowmanA6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'A2:P120',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                        "n_outplanted","n_present", "n_lost", "health_0",
+                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                        "avg_health", "pred_stressor"))
+
+### Yellowman B 3-Month Survey
+yellowmanB3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 4, 
+                    range = 'A2:Y83',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+### Yellowman B 6-Month Survey
+yellowmanB6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 5, 
+                    range = 'A2:Z82',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", "bottom_contact", 
+                                  "fireworm", "snail", "cyanob", "competition", "unknown", "n_stressors"))
+
+### Yellowman C 3-Month Survey
+
+
+### Yellowman C 6-Month Survey
 ```
 
-
-```{r, carls hill 3 mortality rate, echo=FALSE, message=FALSE}
-carl_losses3 <- carl3 %>%
-    group_by(species, geno) %>%
-    summarize(num_outplanted = sum(n_outplanted),
-              num_survived = sum(n_present),
-              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
-    arrange(desc(mortality_rate))
-
-carl_losses3$mortality_rate <- paste0(round(carl_losses3$mortality_rate, 2), "%")
-```
 
 
 **Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health**
-```{r, carls hill calculating weighted coral health by geno, echo=FALSE}
+```{r, carls hill 3 month weighted coral health by geno, echo=FALSE}
 carl_health <- carl3 %>%
-  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -68,22 +113,20 @@ carl_health <- carl3 %>%
                                   Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
   drop_na(weighted_health)
 
-carl_health_agg <- carl_health %>%
-  group_by(geno) %>%
-  summarize(avg_health = mean(weighted_health)) %>%
-  arrange(desc(avg_health))
+### Aggregate Table
+carl3_agg <- carl_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
 
-
-### Table of net losses and weighted health by geno
-carl3_loss_health_table <- carl_losses3 %>%
-  inner_join(carl_health_agg, by = "geno") %>%
-  arrange(desc(avg_health)) 
-
-carl3_loss_health_table_pretty <- carl3_loss_health_table
-carl3_loss_health_table_pretty$avg_health <- paste0(round(carl3_loss_health_table_pretty$avg_health, 2), "%")
-
-
-carl3_loss_health_table_pretty %>% rename("Species" = species, 
+### Table Formatting
+carl3_agg_pretty <- carl3_agg
+carl3_agg_pretty$mortality_rate <- paste0(round(carl3_agg_pretty$mortality_rate, 2), "%")
+carl3_agg_pretty$avg_health <- paste0(round(carl3_agg_pretty$avg_health, 2), "%")
+carl3_agg_pretty %>% rename("Species" = species, 
                        "Geno" = geno, 
                        "# Outplanted" = num_outplanted, 
                        "# Survived" = num_survived, 
@@ -108,35 +151,10 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
 ### Carl's Hill 6-Month Survey
 The following data was taken three months later in a survey conducted on July 4th, 2022. 
 
-```{r, carls hill 6 month survey data, echo=FALSE}
-setwd("~/Documents/Data Science/Reef Renewal Bonaire")
-carl6 <- read_excel("Carls Hill Monitoring Database.xlsx", 
-                    sheet = 3, 
-                    range = 'A2:Z51',
-                    col_names = c("date", "duration", "species", "geno", "cluster", 
-                                  "n_outplanted","n_present", "n_lost", "health_0",
-                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
-                                  "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cyanob", "sedimentation", "unknown", "n_stressors"))
-```
-
-
-
-```{r carls hill 6 month mortality rate, echo=FALSE, message=FALSE}
-carl6_losses <- carl6 %>%
-  group_by(species, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present),
-            mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
-  arrange(desc(mortality_rate))
-```
-
 **Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health**
 ```{r carls hill 6 month weighted health, echo=FALSE}
-### Calculating weighted coral health by geno
 carl6_health <- carl6 %>%
-  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -148,33 +166,32 @@ carl6_health <- carl6 %>%
                                   Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
   drop_na(weighted_health)
 
-carl6_health_agg <- carl6_health %>%
-  group_by(geno) %>%
-  summarize(avg_health = mean(weighted_health)) %>%
-  arrange(desc(avg_health))
+### Aggregate Table
+carl6_agg <- carl6_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
 
-
-### Table of net losses and weighted health by geno
-carl6_loss_health_table <- carl6_losses %>%
-  inner_join(carl6_health_agg, by = "geno") %>%
-  arrange(desc(avg_health)) 
-
-carl6_loss_health_table_pretty <- carl6_loss_health_table
-carl6_loss_health_table_pretty$avg_health <- paste0(round(carl6_loss_health_table_pretty$avg_health, 2), "%")
-carl6_loss_health_table_pretty$mortality_rate <- paste0(round(carl6_loss_health_table_pretty$mortality_rate, 2), "%")
-carl6_loss_health_table_pretty %>% rename("Species" = species, 
-                       "Geno" = geno,
-                        "# Outplanted" = num_outplanted, 
-                       "# Survived" = num_survived,
-                       "Avg. Health" = avg_health, 
-                       "Mortality Rate" = mortality_rate) %>% 
+### Table Formatting
+carl6_agg_pretty <- carl6_agg
+carl6_agg_pretty$mortality_rate <- paste0(round(carl6_agg_pretty$mortality_rate, 2), "%")
+carl6_agg_pretty$avg_health <- paste0(round(carl6_agg_pretty$avg_health, 2), "%")
+carl6_agg_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
 pander()
 ```
 
 
 **Carl's Hill 6-Month Survey: Average Tissue Health Variance**
 ```{r carls hill 6 month boxplot of tissue health, echo=FALSE}
-### boxplot of tissue health by geno
+
 ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
@@ -187,8 +204,9 @@ To assess the change in tissue health, I have included the average tissue health
 
 **Carl's Hill: Change in Average Tissue Health**
 ```{r carls hill comparing surveys, echo=FALSE}
-carl_spread <- carl3_loss_health_table %>%
-  left_join(carl6_loss_health_table, 
+
+carl_spread <- carl3_agg %>%
+  left_join(carl6_agg, 
             by = c("species", "geno"), suffix = c("3", "6")) %>%
   mutate(perc_change = avg_health6 - avg_health3) %>%
   arrange(desc(perc_change))
@@ -224,38 +242,11 @@ The following data has been taken from surveys conducted across the Yellowman lo
 
 While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos #14, #21, and #22 notably less successful than #17-#20.  
 
-```{r, yellowman A data, echo=FALSE}
-setwd("~/Documents/Data Science/Reef Renewal Bonaire")
-yellowman3A <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
-                          sheet = 2, 
-                          range = 'C2:Q136',
-                          col_names = c("date", "duration", "species", "geno", "cluster", 
-                                        "n_outplanted","n_present", "n_lost", "health_0",
-                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                        "pred_stressor"))
 
-yellowman6A <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
-                          sheet = 3, 
-                          range = 'A2:P120',
-                          col_names = c("date", "duration", "species", "geno", "cluster", 
-                                        "n_outplanted","n_present", "n_lost", "health_0",
-                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                        "avg_health", "pred_stressor"))
-```
-
-```{r yellowman3A  mortality, echo=FALSE, message=FALSE}
-yellowman_losses3A <- yellowman3A %>%
-  group_by(species, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present),
-            mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
-  arrange(desc(mortality_rate))
-```
-
-*Ranking Genotypes by Average Tissue Health*
-```{r, yellowman3A calculating 3A weighted coral health by geno, echo=FALSE }
-yellowman_health3A <- yellowman3A %>%
-  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+**Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health**
+```{r, yellowman3A calculating A3 weighted coral health by geno, echo=FALSE }
+yellowmanA3_health <- yellowmanA3 %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -267,31 +258,33 @@ yellowman_health3A <- yellowman3A %>%
                                   Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
   drop_na(weighted_health)
 
-yellowman_health_agg3A <- yellowman_health3A %>%
-  group_by(geno) %>%
-  summarize(avg_health = mean(weighted_health)) %>%
-  arrange(desc(avg_health))
+### Aggregate Table
+yellowmanA3_agg <- yellowmanA3_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
 
-yellowman_loss_health_table3A <- yellowman_losses3A %>%
-  inner_join(yellowman_health_agg3A, by = "geno") %>%
-  arrange(desc(avg_health)) 
-
-yellowman_loss_health_table3A_pretty <- yellowman_loss_health_table3A
-yellowman_loss_health_table3A_pretty$avg_health <- paste0(round(yellowman_loss_health_table3A_pretty$avg_health, 2), "%")
-yellowman_loss_health_table3A_pretty %>% rename("Species" = species, 
-                       "Geno" = geno,
-                        "# Outplanted" = num_outplanted, 
-                       "# Survived" = num_survived,
-                       "Avg. Health" = avg_health, 
-                       "Mortality Rate" = mortality_rate) %>% 
-  pander()
+### Table Formatting
+yellowmanA3_agg_pretty <- yellowmanA3_agg
+yellowmanA3_agg_pretty$mortality_rate <- paste0(round(yellowmanA3_agg_pretty$mortality_rate, 2), "%")
+yellowmanA3_agg_pretty$avg_health <- paste0(round(yellowmanA3_agg_pretty$avg_health, 2), "%")
+yellowmanA3_agg_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
+pander()
 ```
 
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
 
 **Yellowman-A 3-Month Survey: Average Tissue Health Variance**
-```{r, yellowman3A boxplot of tissue health by geno, echo=FALSE}
-ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) + 
+```{r, yellowmanA3 boxplot of tissue health by geno, echo=FALSE}
+ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
@@ -299,24 +292,14 @@ ggplot(yellowman_health3A, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2021-06-23")
 ```
 
-### Yellowman A 3-Month Survey
+### Yellowman A 6-Month Survey
 
 Copy about Yellowman A six-month survey...
 
-```{r yellowman6A  mortality, echo=FALSE, message=FALSE}
-yellowman_losses6A <- yellowman6A %>%
-  group_by(species, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present),
-            mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100) %>%
-  arrange(desc(mortality_rate))
-
-```
-
-**Ranking Genotypes by Average Tissue Health**
-```{r yellowman6A calculating 6A weighted coral health by geno, echo=FALSE }
-yellowman_health6A <- yellowman6A %>%
-  select(geno, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+**Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health**
+```{r yellowmanA6 calculating 6A weighted coral health by geno, echo=FALSE }
+yellowmanA6_health <- yellowmanA6 %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -328,30 +311,31 @@ yellowman_health6A <- yellowman6A %>%
                                   Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
   drop_na(weighted_health)
 
-yellowman_health_agg6A <- yellowman_health6A %>%
-  group_by(geno) %>%
-  summarize(avg_health = mean(weighted_health)) %>%
-  arrange(desc(avg_health))
+### Aggregate Table
+yellowmanA6_agg <- yellowmanA6_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
 
-yellowman_loss_health_table6A <- yellowman_losses6A %>%
-  inner_join(yellowman_health_agg6A, by = "geno") %>%
-  arrange(desc(avg_health)) 
-
-yellowman_loss_health_table6A_pretty <- yellowman_loss_health_table6A
-yellowman_loss_health_table6A_pretty$mortality_rate <- paste0(round(yellowman_loss_health_table6A_pretty$mortality_rate, 2), "%")
-yellowman_loss_health_table6A_pretty$avg_health <- paste0(round(yellowman_loss_health_table6A_pretty$avg_health, 2), "%")
-yellowman_loss_health_table6A_pretty %>% rename("Species" = species, 
-                       "Geno" = geno,
-                        "# Outplanted" = num_outplanted, 
-                       "# Survived" = num_survived,
-                       "Avg. Health" = avg_health, 
-                       "Mortality Rate" = mortality_rate) %>% 
-  pander()
+### Table Formatting
+yellowmanA6_agg_pretty <- yellowmanA6_agg
+yellowmanA6_agg_pretty$mortality_rate <- paste0(round(yellowmanA6_agg_pretty$mortality_rate, 2), "%")
+yellowmanA6_agg_pretty$avg_health <- paste0(round(yellowmanA6_agg_pretty$avg_health, 2), "%")
+yellowmanA6_agg_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
+pander()
 ```
 
-**Yellowman-A 6-Month Survey: Average Tissue Health Variance**
+**Yellowman A 6-Month Survey: Average Tissue Health Variance**
 ```{r yellowman6A boxplot of tissue health by geno, echo=FALSE}
-ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) + 
+ggplot(yellowmanA6_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
@@ -360,12 +344,12 @@ ggplot(yellowman_health6A, aes(x = factor(geno), y = weighted_health)) +
 ```
 
 
-The visual below indicates a more pronounced decline in tissue health than from the Carl's Hill surveys.  Furthermore, the percent decline for each genotype has a **71.7% correlation** with the initial average health rating.  Said differently, the data suggests that the negative change in tissue health has a moderate linear relationship with the initial tissue health average.  
+The visual below indicates a more pronounced decline in tissue health than from the Carl's Hill surveys.  Furthermore, the percent decline for each genotype has a **71.7% correlation** with the initial average health rating.  Said differently, the data suggests that the negative change in tissue health is generally less when the initial tissue health rating is higher.  
 
 **Yellowman A: Change in Average Tissue Health**
 ```{r yellowman A comparing surveys, echo=FALSE}
-yellowmanA_spread <- yellowman_loss_health_table3A %>%
-  left_join(yellowman_loss_health_table6A, 
+yellowmanA_spread <- yellowmanA3_agg %>%
+  left_join(yellowmanA6_agg, 
             by = c("species", "geno"), suffix = c("3", "6")) %>%
   mutate(perc_change = avg_health6 - avg_health3) %>%
   arrange(desc(perc_change))
@@ -390,22 +374,93 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
 ```
 
 
-### Yellowman B Location
+### Yellowman B 3-Month Survey
 
-Yellowman B Copy
+At Yellowman B, Bonaire Reef Renewal outplanted different genotypes.  Only geno #1 overlaps between Yellowman A and Yellowman B.
 
-```{r yellowman B, echo=FALSE}
-setwd("~/Documents/Data Science/Reef Renewal Bonaire")
-yellowman3B <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
-                    sheet = 4, 
-                    range = 'A2:Y83',
-                    col_names = c("date", "duration", "species", "geno", "cluster", 
-                                  "n_outplanted","n_present", "n_lost", "health_0",
-                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+**Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health**
+```{r yellowmanB3 calculating B3 weighted coral health by geno, echo=FALSE }
+yellowmanB3_health <- yellowmanB3 %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  rowwise() %>%
+  mutate(Health0 = sum(health_0, na.rm = TRUE),
+         Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
+         Health100 = sum(health_100, na.rm = TRUE),
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
+
+### Aggregate Table
+yellowmanB3_agg <- yellowmanB3_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
+
+### Table Formatting
+yellowmanB3_agg_pretty <- yellowmanB3_agg
+yellowmanB3_agg_pretty$mortality_rate <- paste0(round(yellowmanB3_agg_pretty$mortality_rate, 2), "%")
+yellowmanB3_agg_pretty$avg_health <- paste0(round(yellowmanB3_agg_pretty$avg_health, 2), "%")
+yellowmanB3_agg_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
+pander()
 ```
 
+**Yellowman B 3-Month Survey: Average Tissue Health Variance**
+```{r yellowmanB3 boxplot of tissue health by geno, echo=FALSE}
+ggplot(yellowmanB3_health, aes(x = factor(geno), y = weighted_health)) + 
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Acer Genotype", 
+       y = "Percent of Healthy Tissue",
+       caption =  "Adj. Survey Date: 2022-03-24")
+```
+
+**Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health**
+```{r yellowmanB6 calculating B6 weighted coral health by geno, echo=FALSE }
+yellowmanB6_health <- yellowmanB6 %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  rowwise() %>%
+  mutate(Health0 = sum(health_0, na.rm = TRUE),
+         Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.4, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.65, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
+         Health100 = sum(health_100, na.rm = TRUE),
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
+
+### Aggregate Table
+yellowmanB6_agg <- yellowmanB6_health %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present),
+              mortality_rate = ((num_outplanted - num_survived) / num_outplanted) * 100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(desc(avg_health))
+
+### Table Formatting
+yellowmanB6_agg_pretty <- yellowmanB6_agg
+yellowmanB6_agg_pretty$mortality_rate <- paste0(round(yellowmanB6_agg_pretty$mortality_rate, 2), "%")
+yellowmanB6_agg_pretty$avg_health <- paste0(round(yellowmanB6_agg_pretty$avg_health, 2), "%")
+yellowmanB6_agg_pretty %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
+pander()
+```
 
 ## Ecological Footprint
 
@@ -447,14 +502,16 @@ c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Precent of Total" = Percent_of_Total) %>%
   pander()
 ```
+
+
 **Yellowman B 3-Month Survey**
 ```{r opportunities yellowmanB3 bottom contact, echo=FALSE}
-yb3bottom_perc <- yellowman3B %>%
+yb3bottom_perc <- yellowmanB3 %>%
   summarize(N_Outplanted = n(),
             Total_Stressors = sum(n_stressors, na.rm = TRUE),
             Bottom_Contact = sum(bottom_contact, na.rm = TRUE),
-            Percent_of_Total = (sum(yellowman3B$bottom_contact, na.rm = TRUE) / 
-                sum(yellowman3B$n_stressors, na.rm = TRUE) * 100))
+            Percent_of_Total = (sum(yellowmanB3$bottom_contact, na.rm = TRUE) / 
+                sum(yellowmanB3$n_stressors, na.rm = TRUE) * 100))
 
 yb3bottom_perc$Percent_of_Total <-paste0(round(yb3bottom_perc$Percent_of_Total, 2), "%")
 yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
