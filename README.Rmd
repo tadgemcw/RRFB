@@ -596,7 +596,6 @@ ltsummary %>% count(site_name)
 
 ### Possible Apal options: Knife I, Oilslick (2x), South Bay II (2x)
 ### Possible Acer options: Mi Dushi I, Punt Vierkant
-
 ltsummary %>% 
   ggplot(aes(x=survey_date, y=eco_footprint, color = site_name, shape = species)) +
     geom_point(size = 3) +
@@ -605,7 +604,36 @@ ltsummary %>%
          y = 'Eco-Footprint (m)',
          color = 'Site',
          shape = 'Species')
-  
+
+
+ltsummary %>% 
+  filter(tot_coral_area < 100) %>%
+  ggplot(aes(x=survey_date, y=tot_coral_area, color = site_name, shape = species)) +
+    geom_point(size = 3) +
+    geom_line() + 
+    labs(x = 'Time', 
+         y = 'Total Coral Area (m)',
+         color = 'Site',
+         shape = 'Species')
+```
+
+
+```{r, eco growth by metric, echo=FALSE}
+ltsummary_long <- ltsummary %>% 
+  pivot_longer("eco_footprint":"restored_area", 
+               names_to = "metric",
+               values_to = "values") 
+
+ltsummary_long %>%
+  ggplot(aes(x=survey_date, y=values, color=metric, shape=species)) +
+    geom_point(size = 3) +
+    geom_line() + 
+    facet_wrap(vars(site_name)) +
+    scale_color_discrete(labels = c("Eco-Footprint", "Restored Area", "Total Coral Area")) +
+    labs(x = 'Time', 
+         y = 'Growth (m)',
+         color = 'Metric',
+         shape = 'Species')
 ```
 
 
