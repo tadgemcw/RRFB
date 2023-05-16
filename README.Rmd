@@ -18,7 +18,7 @@ library(knitr)
 ```
 
 ## Introduction
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) in developing a successful, data driven program through which to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  The following analysis is intended to adhear to the guidence proposed by NOAA in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.*
+The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  The following analysis is intended to adhear to the guidence proposed by NOAA in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.*
 
 
 ```{r, loading data, echo=FALSE}
@@ -672,7 +672,7 @@ c3bottom_perc$Percent_of_Total <-paste0(round(c3bottom_perc$Percent_of_Total, 2)
 c3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
-                       "Precent of Surveyed" = Percent_of_Total) %>%
+                       "Percent of Surveyed" = Percent_of_Total) %>%
   pander()
 ```
 
@@ -689,7 +689,7 @@ c6bottom_perc$Percent_of_Total <-paste0(round(c6bottom_perc$Percent_of_Total, 2)
 c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
-                       "Precent of Surveyed" = Percent_of_Total) %>%
+                       "Percent of Surveyed" = Percent_of_Total) %>%
   pander()
 ```
 
@@ -707,7 +707,7 @@ yb3bottom_perc$Percent_of_Total <-paste0(round(yb3bottom_perc$Percent_of_Total, 
 yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
-                       "Precent of Surveyed" = Percent_of_Total) %>%
+                       "Percent of Surveyed" = Percent_of_Total) %>%
   pander()
 ```
 
@@ -724,7 +724,7 @@ yb6bottom_perc$Percent_of_Total <-paste0(round(yb6bottom_perc$Percent_of_Total, 
 yb6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
-                       "Precent of Surveyed" = Percent_of_Total) %>%
+                       "Percent of Surveyed" = Percent_of_Total) %>%
   pander()
 ```
 
@@ -742,7 +742,7 @@ yc3bottom_perc$Percent_of_Total <-paste0(round(yc3bottom_perc$Percent_of_Total, 
 yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
-                       "Precent of Surveyed" = Percent_of_Total) %>%
+                       "Percent of Surveyed" = Percent_of_Total) %>%
   pander()
 ```
 
