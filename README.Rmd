@@ -18,7 +18,7 @@ library(knitr)
 ```
 
 ## Introduction
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  The following analysis is intended to adhear to the guidence proposed by NOAA in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.*
+The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  The following analysis is intended to adhere to the guidance proposed by NOAA in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.*
 
 
 ```{r, loading data, echo=FALSE}
@@ -110,7 +110,7 @@ ltsummary <- read_excel("Monitoring Summary.xlsx",
 ### Removing NAs  
 ltsummary <- ltsummary %>% drop_na(eco_footprint)
 ```
-
+The following charts highlight the changes in ecological footprints and total coral coverage from year to year.  Data was used from BRRF's long-term surveys, which includes calculations from photomosaics of sites.
 
 *Change in Ecological Footprints Over Time*
 ```{r ecological footprint, echo=FALSE}
@@ -143,7 +143,7 @@ ltsummary %>%
 ```
 
 
-In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time on the site-level.  Please note that the Total Coral Area and Restored Area often share the same values or can be quite similar.
+In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time on the site-level.  As additional surveys are added, it may be possible to model future trends.  Please note that the Total Coral Area and Restored Area often share the same values or can be quite similar during the early years of an outplanting.
 
 *Long-Term Growth by Site*
 ```{r, eco growth by metric, echo=FALSE, message=FALSE}
@@ -168,9 +168,9 @@ ltsummary_long %>%
 
 ## Species: Apal
 ### Carl's Hill 3-Month Survey
-The summary statistics below were generated from a survey of coral health between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the previously outplanted corals or a survey error.
+The summary statistics below were generated from a survey of coral health between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the outplanted corals or a survey error.
 
-Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  I should note that the weighted average of tissue health does not include dead observations. [^1]
+Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  Note that the weighted average of tissue health does not include dead observations. [^1]
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
@@ -225,7 +225,7 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
 ```
 
 ### Carl's Hill 6-Month Survey
-The following data was taken three months later in a survey conducted on July 4th, 2022. 
+The following data was taken three months later in a survey conducted on July 4th, 2022.   When compared with the three-month survey, some genos have performed better than others.  Genos #6-9 and #22-23 improved in average tissue health, while the remaining genos declined in health.  
 
 *Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r carls hill 6 month weighted health, echo=FALSE, message=FALSE}
@@ -276,7 +276,7 @@ ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) +
        caption = "Survey Date: 2022-07-04")
 ```
 
-To assess the change in tissue health, I have included the average tissue health for each genotype during the three- and six-month surveys.
+To better visualize the change in tissue health, I have included the average tissue health for each genotype during the three- and six-month surveys. Comparing and combining the changes with other Apal sites may help create a more diverse sample and reduce site bias.
 
 *Carl's Hill: Change in Average Tissue Health*
 ```{r carls hill comparing surveys, echo=FALSE}
@@ -316,7 +316,7 @@ The following data has been taken from surveys conducted across the Yellowman lo
 
 ### Yellowman A 3-Month Survey
 
-While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos #14, #21, and #22 notably less successful than #17-#20.  
+While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos #14, #21, and #22 are notably less successful than #17-#20.  
 
 
 *Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health*
@@ -452,7 +452,7 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
 
 ### Yellowman B 3-Month Survey
 
-At Yellowman B, Bonaire Reef Renewal outplanted different genotypes.  Only geno #1 overlaps between Yellowman A and Yellowman B.
+At Yellowman B, BRRF outplanted different genotypes from Yellowman A.  Only geno #1 overlaps between Yellowman A and Yellowman B.
 
 *Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanB3 calculating B3 weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -657,7 +657,7 @@ yellowmanA3C3_health %>%
 
 
 ## Actionable Opportunities
-There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these, especially disease and predation, are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is likely an unavoidable event during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is an unavoidable event during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
 
 *Carl's Hill 3-Month Survey*
 ```{r, carl 3 bottom stressor proportion, echo=FALSE}
@@ -746,4 +746,4 @@ yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
   pander()
 ```
 
-The percentage of Bottom Contact stressors declines greatly between the 3- and 6-month surveys.  It seems plausible that the strength of the adhesive could play an important role maintaining stability as new corals establish their natural connections with the environment. 
+The percentage of Bottom Contact stressors declines greatly between the three- and six-month surveys.  It seems plausible that the addition of a stronger adhesive could plan an important role in maintaining stability as new corals establish their natural connections with the environment. 
