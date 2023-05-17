@@ -358,7 +358,7 @@ pander()
 
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
 
-*Yellowman-A 3-Month Survey: Average Tissue Health Variance*
+*Yellowman A 3-Month Survey: Average Tissue Health Variance*
 ```{r, yellowmanA3 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
@@ -556,6 +556,7 @@ ggplot(yellowmanB6_health, aes(x = factor(geno), y = weighted_health)) +
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2022-06-30")
 ```
+
 The average change in tissue health between surveys is lower at Yellowman B than at other sites.
 
 *Yellowman B: Change in Average Tissue Health*
@@ -586,6 +587,8 @@ ggplot(yellowmanB_long, aes(x = factor(geno), y = values)) +
 ```
 
 ### Yellowman C 3-Month Survey
+
+The Yellowman C site shares many of the same genos as at Yellowman A.  The mortality rate, however, is much greater at Yellowman C.
 
 *Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman C 3-Month weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -624,6 +627,8 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
 pander()
 ```
 
+Stressors were present in all but three of the observations.  It is likely this is an important factor in the lower average tissue health at the site.  A six-month survey is not yet available.  It will be interesting to compare the three- to six-month changes at Yellowman C with those at Yellowman A.
+
 *Yellowman C 3-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanC3 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) + 
@@ -636,7 +641,7 @@ ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) +
 
 ### Comparing Yellowman Sites
 
-In the visual below, I have extracted the genotypes which are present at both the Yellowman A and Yellowman C sites.  The data suggests that the corals at Yellowman A out perform those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed, creating a potentially unequal environment for comparison.
+In the visual below, I have extracted the genotypes present at both Yellowman A and Yellowman C, as of their three-month surveys.  The data suggests that the corals at Yellowman A are out performing those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed during the preceding three months, creating a potentially unequal environment for comparison.
 
 *Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys*
 ```{r Comparing YellowmanA 3 with Yellowman C 3, echo=FALSE}
@@ -665,7 +670,8 @@ yellowmanA3C3_health %>%
 
 
 ## Actionable Opportunities
-There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is an unavoidable event during storms or wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
+There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is unavoidable during storms and wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
+
 
 *Carl's Hill 3-Month Survey*
 ```{r, carl 3 bottom stressor proportion, echo=FALSE}
@@ -754,4 +760,4 @@ yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
   pander()
 ```
 
-The percentage of Bottom Contact stressors declines greatly between the three- and six-month surveys.  It seems plausible that the addition of a stronger adhesive could plan an important role in maintaining stability as new corals establish their natural connections with the environment. 
+
