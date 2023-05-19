@@ -2,7 +2,7 @@
 title: "Analysis of Coral Restoration Efforts"
 subtitle: "A Collaboration with Bonaire Reef Renewal Foundation"
 author: "Tadge McWilliams"
-date: "May 18th, 2023"
+date: "May 19th, 2023"
 output: 
   html_document:
     toc: TRUE
@@ -24,13 +24,13 @@ library(rempsyc)
 
 
 ## Summary
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  By calculating mortality rates and average tissue health, I was able to identify which genotypes performed better than others and begin to track the changes in health over time.  While further work is needed, this could lay the framework for future models.  
+The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of global warming.  Through mortality rate and average tissue health calculations, I was able to identify which genotypes performed better than others and begin to track the changes in health over time.  While further work is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
 
 ## Methodology
 
-This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by BRRF.  The ecological footprint data was collected via photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.
-Mortality rates are a standard calculation of (corals present - corals outplanted) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 40%, 65%, 87%, and 100%) is used to calculate the average tissue health.  Note that the calculation does not include dead observations.[^1]
-All calculations and visualizations are performed using R.  R packages for this project include readxl, tidyverse, pander, flextable, and rempsyc.  The report is formated in Markdown, and all content has been pushed to a github repository.
+This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by BRRF.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.  
+Mortality rates are a standard calculation of (corals present - corals outplanted) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 40%, 65%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations, or those with 0% tissue health.[^1]
+All calculations and visualizations are performed using R.  R packages for this project include readxl, tidyverse, pander, flextable, and rempsyc.  The report is formatted in Markdown, and all versions have been pushed to a github repository.
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
@@ -124,7 +124,7 @@ ltsummary <- read_excel("Monitoring Summary.xlsx",
 ### Removing NAs  
 ltsummary <- ltsummary %>% drop_na(eco_footprint)
 ```
-The following charts highlight the changes in ecological footprints and total coral coverage from year to year.  Data was used from BRRF's long-term surveys, which includes calculations from their photomosaics of coral coverage.
+The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from BRRF's long-term surveys was used for this section.  Since new outplanting sites are created each year, not all sites have been surveyed equally.  
 
 *Change in Ecological Footprints Over Time*
 ```{r ecological footprint, echo=FALSE}
@@ -157,7 +157,7 @@ ltsummary %>%
 ```
 
 
-In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values or can be quite similar during the early years of outplanting.
+In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values or can be quite similar during the early years of growth.
 
 *Long-Term Growth by Site*
 ```{r, eco growth by metric, echo=FALSE, message=FALSE}
@@ -180,11 +180,15 @@ ltsummary_long %>%
 ```
 
 
+
 ## Species: Apal
+
 ### Carl's Hill 3-Month Survey
+
 The summary statistics below were generated from a survey of coral health from April 11th, 2021 to May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the outplanted corals or a survey error.
 
 Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  
+
 
 *Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, carls hill 3 month weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -224,7 +228,9 @@ nice_table()
 ```
 
 
+
 Outliers can easily skew the averages of an aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #9, and #21 is slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
+
 
 *Carl's Hill 3-Month Survey: Average Tissue Health Variance*
 ```{r, carls hill boxplot of tissue health by geno, echo=FALSE}
@@ -238,6 +244,7 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
 
 ### Carl's Hill 6-Month Survey
 The following data was taken three months later in a survey conducted on July 4th, 2022.   When compared with the three-month survey, some genos have performed better than others.  Genos #6-9 and #22-23 improved in average tissue health, while the remaining genos declined in health.  
+
 
 *Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r carls hill 6 month weighted health, echo=FALSE, message=FALSE}
@@ -277,6 +284,7 @@ nice_table()
 ```
 The changes in variance between the three- and six-month surveys often correspond with the addition of stressors to some of the observations. 
 
+
 *Carl's Hill 6-Month Survey: Average Tissue Health Variance*
 ```{r carls hill 6 month boxplot of tissue health, echo=FALSE}
 
@@ -289,6 +297,7 @@ ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) +
 ```
 
 To better visualize the change in tissue health, I have summarized the average tissue health for each genotype during the three- and six-month surveys. Comparing changes and combining the data from other Apal sites may help create a more diverse sample and reduce site bias.
+
 
 *Carl's Hill: Change in Average Tissue Health*
 ```{r carls hill comparing surveys, echo=FALSE}
@@ -322,9 +331,10 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
 
 ## Species: Acer
 
-The following data has been taken from surveys conducted across the Yellowman locations.  Within the location, there are A, B, and C sub-locations.
+The following data was taken from surveys conducted across the Yellowman sites  Within the Yellowman site, there are A, B, and C sub-sites.
 
 The Acer species appears to be more successful than the Apal.  Over 700 more corals were outplanted at the Yellowman A location than at Carl's Hill with 11 fewer fatalities.  Additional factors are likely to contribute to these statistics; however, it is worth noting that the two locations are quite geographically close to one another.  The Yellowman sites would be subject to much of the same conditions as Carl's Hill.
+
 
 ### Yellowman A 3-Month Survey
 
@@ -368,7 +378,9 @@ yellowmanA3_agg_pretty %>% rename("Species" = species,
 nice_table()
 ```
 
+
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
+
 
 *Yellowman A 3-Month Survey: Average Tissue Health Variance*
 ```{r, yellowmanA3 boxplot of tissue health by geno, echo=FALSE}
@@ -380,9 +392,12 @@ ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2021-06-23")
 ```
 
+
 ### Yellowman A 6-Month Survey
 
+
 After six months, genos #17, #21, and #22 still have a 0% mortality rate.
+
 
 *Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanA6 calculating 6A weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -420,7 +435,10 @@ yellowmanA6_agg_pretty %>% rename("Species" = species,
                        "Avg. Health" = avg_health) %>% 
 nice_table()
 ```
+
+
 The variance of tissue health below remains relatively stable.  Most corals have decreased in average health, but the interquartile range of observations is fairly close.
+
 
 *Yellowman A 6-Month Survey: Average Tissue Health Variance*
 ```{r yellowman6A boxplot of tissue health by geno, echo=FALSE}
@@ -434,6 +452,7 @@ ggplot(yellowmanA6_health, aes(x = factor(geno), y = weighted_health)) +
 
 
 The visual below indicates a more pronounced decline in tissue health than from the Carl's Hill surveys.  Also, the percent decline of each geno has a *71.7% correlation* with the initial average health rating of that geno.  This correlation could be investigated further to see if a more diverse sample of the population yields a more robust model.    
+
 
 *Yellowman A: Change in Average Tissue Health*
 ```{r yellowman A comparing surveys, echo=FALSE}
@@ -465,7 +484,9 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
 
 ### Yellowman B 3-Month Survey
 
+
 At Yellowman B, BRRF outplanted different genotypes from Yellowman A.  Only geno #1 is shared between Yellowman A and Yellowman B.
+
 
 *Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanB3 calculating B3 weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -504,7 +525,9 @@ yellowmanB3_agg_pretty %>% rename("Species" = species,
 nice_table()
 ```
 
+
 With the exception of geno #9, most genotypes have relatively high average tissue health. 
+
 
 *Yellowman B 3-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanB3 boxplot of tissue health by geno, echo=FALSE}
@@ -516,9 +539,12 @@ ggplot(yellowmanB3_health, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2022-03-24")
 ```
 
+
 ### Yellowman B 6-Month Survey
 
+
 The six-month survey of Yellowman B shows quite a low mortality rate.
+
 
 *Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanB6 calculating B6 weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -557,7 +583,9 @@ yellowmanB6_agg_pretty %>% rename("Species" = species,
 nice_table()
 ```
 
+
 There are tissue health many outliers in the six-month survey. Disease, ciliate, and fireworm stressors were not uncommon.  However, geno #9 had the lowest average tissue health of any Yellowman B geno, but only one fireworm stressor was recorded out of the 50 corals observed.
+
 
 *Yellowman B 6-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanB6 boxplot of tissue health by geno, echo=FALSE}
@@ -569,7 +597,9 @@ ggplot(yellowmanB6_health, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2022-06-30")
 ```
 
+
 The average change in tissue health between surveys is lower at Yellowman B than at other sites.
+
 
 *Yellowman B: Change in Average Tissue Health*
 ```{r yellowman B comparing surveys, echo=FALSE}
@@ -598,9 +628,12 @@ ggplot(yellowmanB_long, aes(x = factor(geno), y = values)) +
   theme_light()
 ```
 
+
 ### Yellowman C 3-Month Survey
 
+
 The Yellowman C site shares many of the same genos as at Yellowman A.  The mortality rate, however, is much greater at Yellowman C.
+
 
 *Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman C 3-Month weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -639,7 +672,9 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
 nice_table()
 ```
 
+
 Stressors were present in all but three of the observations.  It is likely this is an important factor in the lower average tissue health at the site.  A six-month survey is not yet available.  It will be interesting to compare the three- to six-month changes at Yellowman C with those at Yellowman A.
+
 
 *Yellowman C 3-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanC3 boxplot of tissue health by geno, echo=FALSE}
@@ -651,9 +686,11 @@ ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) +
        caption =  "Adj. Survey Date: 2022-11-12")
 ```
 
+
 ### Comparing Yellowman Sites
 
 In the visual below, I have extracted the genotypes present at both Yellowman A and Yellowman C, as of their three-month surveys.  The data suggests that the corals at Yellowman A are out performing those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed during the preceding three months, creating a potentially unequal environment for comparison.
+
 
 *Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys*
 ```{r Comparing YellowmanA 3 with Yellowman C 3, echo=FALSE}
@@ -679,9 +716,8 @@ yellowmanA3C3_health %>%
 ```
 
 
-
-
 ## Actionable Opportunities
+
 There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is unavoidable during storms and wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
 
 
