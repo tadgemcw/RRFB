@@ -24,13 +24,13 @@ library(rempsyc)
 
 
 ## Summary
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of global warming.  Through mortality rate and average tissue health calculations, I was able to identify which genotypes performed better than others and begin to track the changes in health over time.  While further work is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
+The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes to the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of climate change.  Through mortality and average tissue health calculations, I was able to identify which genotypes are performing better than others and begin to track the changes in tissue health over time.  While more analysis is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
 
 ## Methodology
 
 This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by BRRF.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.  
 Mortality rates are a standard calculation of (corals present - corals outplanted) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 40%, 65%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations, or those with 0% tissue health.[^1]
-All calculations and visualizations are performed using R.  R packages for this project include readxl, tidyverse, pander, flextable, and rempsyc.  The report is formatted in Markdown, and all versions have been pushed to a github repository.
+All calculations and visualizations are performed using R.  R packages for this project include readxl, dplyr, ggplot2, flextable, and rempsyc.  The report is formatted in Markdown, and all versions have been pushed to a github repository.
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
@@ -124,9 +124,8 @@ ltsummary <- read_excel("Monitoring Summary.xlsx",
 ### Removing NAs  
 ltsummary <- ltsummary %>% drop_na(eco_footprint)
 ```
-The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from BRRF's long-term surveys was used for this section.  Since new outplanting sites are created each year, not all sites have been surveyed equally.  
+The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from BRRF's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
 
-*Change in Ecological Footprints Over Time*
 ```{r ecological footprint, echo=FALSE}
 
 ### Possible Apal options: Knife I, Oilslick (2x), South Bay II (2x)
@@ -138,12 +137,12 @@ ltsummary %>%
     labs(x = 'Time', 
          y = 'Eco-Footprint (m)',
          color = 'Site',
-         shape = 'Species')
+         shape = 'Species',
+         title = 'Change in Ecological Footprints Over Time')
 
 ```
 
 
-*Change in Total Coral Area Over Time*
 ```{r longterm total coral area, echo=FALSE}
 ltsummary %>% 
   filter(tot_coral_area < 100) %>%
@@ -153,13 +152,13 @@ ltsummary %>%
     labs(x = 'Time', 
          y = 'Total Coral Area (m)',
          color = 'Site',
-         shape = 'Species')
+         shape = 'Species',
+         title = 'Change in Total Coral Area Over Time')
 ```
 
 
-In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values or can be quite similar during the early years of growth.
+In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values, or can be quite similar, during the early years of growth.
 
-*Long-Term Growth by Site*
 ```{r, eco growth by metric, echo=FALSE, message=FALSE}
 ltsummary_long <- ltsummary %>% 
   pivot_longer("eco_footprint":"restored_area", 
@@ -175,7 +174,8 @@ ltsummary_long %>%
     labs(x = 'Time', 
          y = 'Growth (m)',
          color = 'Metric',
-         shape = 'Species') +
+         shape = 'Species',
+         title = 'Long-Term Growth by Site') +
     guides(color=guide_legend(override.aes=list(shape=15)))
 ```
 
@@ -185,12 +185,11 @@ ltsummary_long %>%
 
 ### Carl's Hill 3-Month Survey
 
-The summary statistics below were generated from a survey of coral health from April 11th, 2021 to May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the outplanted corals or a survey error.
+The summary statistics below were generated from a survey of coral health between April 11th, 2021 to May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the three-month survey than were originally outplanted.  It is unknown whether this was caused by a division of corals or a survey error.
 
 Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  
 
 
-*Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, carls hill 3 month weighted coral health by geno, echo=FALSE, message=FALSE}
 carl_health <- carl3 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -224,7 +223,7 @@ carl3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
@@ -232,21 +231,20 @@ nice_table()
 Outliers can easily skew the averages of an aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #9, and #21 is slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
 
 
-*Carl's Hill 3-Month Survey: Average Tissue Health Variance*
 ```{r, carls hill boxplot of tissue health by geno, echo=FALSE}
 ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
-       caption = "Adj. Survey Date: 2022-04-27")
+       caption = "Adj. Survey Date: 2022-04-27",
+       title = "Carl's Hill 3-Month Survey: Average Tissue Health Variance")
 ```
 
 ### Carl's Hill 6-Month Survey
-The following data was taken three months later in a survey conducted on July 4th, 2022.   When compared with the three-month survey, some genos have performed better than others.  Genos #6-9 and #22-23 improved in average tissue health, while the remaining genos declined in health.  
+The following data was taken three months later in a survey conducted on July 4th, 2022.   When compared with the three-month survey, some genos have performed better than others.  Genos #2, #5, #13, #22-23 maintained a 0% mortality rate.  Genos #6-9 and #22-23 improved in average tissue health, while the remaining genos declined in health.  
 
 
-*Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r carls hill 6 month weighted health, echo=FALSE, message=FALSE}
 carl6_health <- carl6 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -280,12 +278,12 @@ carl6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
-The changes in variance between the three- and six-month surveys often correspond with the addition of stressors to some of the observations. 
+
+The changes in variance between the three- and six-month surveys often correspond with the addition of new stressors to some of the observations. 
 
 
-*Carl's Hill 6-Month Survey: Average Tissue Health Variance*
 ```{r carls hill 6 month boxplot of tissue health, echo=FALSE}
 
 ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) + 
@@ -293,13 +291,13 @@ ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
-       caption = "Survey Date: 2022-07-04")
+       caption = "Survey Date: 2022-07-04",
+       title = "Carl's Hill 6-Month Survey: Average Tissue Health Variance")
 ```
 
 To better visualize the change in tissue health, I have summarized the average tissue health for each genotype during the three- and six-month surveys. Comparing changes and combining the data from other Apal sites may help create a more diverse sample and reduce site bias.
 
 
-*Carl's Hill: Change in Average Tissue Health*
 ```{r carls hill comparing surveys, echo=FALSE}
 
 carl_spread <- carl3_agg %>%
@@ -323,7 +321,8 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
                      values = c("dodgerblue1", "magenta3")) +
   labs(x = "Apal Genotypes",
        y = "Percent of Healthy Tissue",
-       color = "Survey") +
+       color = "Survey",
+       title = "Carl's Hill: Change in Average Tissue Health") +
   theme_light()
 ```
 
@@ -331,17 +330,16 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
 
 ## Species: Acer
 
-The following data was taken from surveys conducted across the Yellowman sites  Within the Yellowman site, there are A, B, and C sub-sites.
+The following data was taken from surveys conducted across the Yellowman sites.  Within the Yellowman site, there are A, B, and C sub-sites.
 
 The Acer species appears to be more successful than the Apal.  Over 700 more corals were outplanted at the Yellowman A location than at Carl's Hill with 11 fewer fatalities.  Additional factors are likely to contribute to these statistics; however, it is worth noting that the two locations are quite geographically close to one another.  The Yellowman sites would be subject to much of the same conditions as Carl's Hill.
 
 
 ### Yellowman A 3-Month Survey
 
-While mortality rates are consistently low for the species, there is a distinct range in the average tissue health.  Genos #14, #21, and #22 are notably less successful than #17-#20.  
+While mortality rates are consistently low for the species, there is a broad range in average tissue health.  Genos #14, #21, and #22 are notably less successful than #17-#20.  
 
 
-*Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman3A calculating A3 weighted coral health by geno, echo=FALSE, message=FALSE}
 yellowmanA3_health <- yellowmanA3 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -375,21 +373,21 @@ yellowmanA3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
 
 
-*Yellowman A 3-Month Survey: Average Tissue Health Variance*
 ```{r, yellowmanA3 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
-       caption =  "Adj. Survey Date: 2021-06-23")
+       caption =  "Adj. Survey Date: 2021-06-23",
+       title = "Yellowman A 3-Month Survey: Average Tissue Health Variance")
 ```
 
 
@@ -399,7 +397,6 @@ ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) +
 After six months, genos #17, #21, and #22 still have a 0% mortality rate.
 
 
-*Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanA6 calculating 6A weighted coral health by geno, echo=FALSE, message=FALSE}
 yellowmanA6_health <- yellowmanA6 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -433,28 +430,27 @@ yellowmanA6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
 The variance of tissue health below remains relatively stable.  Most corals have decreased in average health, but the interquartile range of observations is fairly close.
 
 
-*Yellowman A 6-Month Survey: Average Tissue Health Variance*
 ```{r yellowman6A boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanA6_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
-       caption =  "Adj. Survey Date: 2021-10-12")
+       caption =  "Adj. Survey Date: 2021-10-12",
+       title = "Yellowman A 6-Month Survey: Average Tissue Health Variance")
 ```
 
 
-The visual below indicates a more pronounced decline in tissue health than from the Carl's Hill surveys.  Also, the percent decline of each geno has a *71.7% correlation* with the initial average health rating of that geno.  This correlation could be investigated further to see if a more diverse sample of the population yields a more robust model.    
+The visual below indicates a more pronounced decline in tissue health than from the Carl's Hill surveys. The percent decline of each geno has a *71.7% correlation* with the initial average health rating of that geno.  This correlation could be investigated further to see if a more diverse sample of the population yields a more robust model.    
 
 
-*Yellowman A: Change in Average Tissue Health*
 ```{r yellowman A comparing surveys, echo=FALSE}
 yellowmanA_spread <- yellowmanA3_agg %>%
   left_join(yellowmanA6_agg, 
@@ -477,7 +473,8 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
                      values = c("dodgerblue1", "magenta3")) +
   labs(x = "Acer Genotypes",
        y = "Percent of Healthy Tissue",
-       color = "Survey") +
+       color = "Survey",
+       title = "Yellowman A: Change in Average Tissue Health") +
   theme_light()
 ```
 
@@ -485,10 +482,9 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
 ### Yellowman B 3-Month Survey
 
 
-At Yellowman B, BRRF outplanted different genotypes from Yellowman A.  Only geno #1 is shared between Yellowman A and Yellowman B.
+At Yellowman B, BRRF outplanted different genotypes from those at Yellowman A.  Only geno #1 is shared between Yellowman A and Yellowman B.
 
 
-*Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanB3 calculating B3 weighted coral health by geno, echo=FALSE, message=FALSE}
 yellowmanB3_health <- yellowmanB3 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -522,21 +518,21 @@ yellowmanB3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
 With the exception of geno #9, most genotypes have relatively high average tissue health. 
 
 
-*Yellowman B 3-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanB3 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanB3_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
-       caption =  "Adj. Survey Date: 2022-03-24")
+       caption =  "Adj. Survey Date: 2022-03-24",
+       title = "Yellowman B 3-Month Survey: Average Tissue Health Variance")
 ```
 
 
@@ -546,7 +542,6 @@ ggplot(yellowmanB3_health, aes(x = factor(geno), y = weighted_health)) +
 The six-month survey of Yellowman B shows quite a low mortality rate.
 
 
-*Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r yellowmanB6 calculating B6 weighted coral health by geno, echo=FALSE, message=FALSE}
 yellowmanB6_health <- yellowmanB6 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -580,28 +575,27 @@ yellowmanB6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
-There are tissue health many outliers in the six-month survey. Disease, ciliate, and fireworm stressors were not uncommon.  However, geno #9 had the lowest average tissue health of any Yellowman B geno, but only one fireworm stressor was recorded out of the 50 corals observed.
+There are many tissue health outliers in the six-month survey. Disease, ciliate, and fireworm stressors were common.  However, geno #9 had the lowest average tissue health of any Yellowman B geno, but only one fireworm stressor was recorded out of the 50 corals observed.  This indicates its poorer performance is not due to the observed stressors.
 
 
-*Yellowman B 6-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanB6 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanB6_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
-       caption =  "Adj. Survey Date: 2022-06-30")
+       caption =  "Adj. Survey Date: 2022-06-30",
+       title = "Yellowman B 6-Month Survey: Average Tissue Health Variance")
 ```
 
 
-The average change in tissue health between surveys is lower at Yellowman B than at other sites.
+The average change in tissue health between surveys is lower at Yellowman B than at other sites.  This data furthers the possibility that the genotypes at Yellowman B are more resiliant than those at Yellowman A.
 
 
-*Yellowman B: Change in Average Tissue Health*
 ```{r yellowman B comparing surveys, echo=FALSE}
 yellowmanB_spread <- yellowmanB3_agg %>%
   left_join(yellowmanB6_agg, 
@@ -624,7 +618,8 @@ ggplot(yellowmanB_long, aes(x = factor(geno), y = values)) +
                      values = c("dodgerblue1", "magenta3")) +
   labs(x = "Acer Genotypes",
        y = "Percent of Healthy Tissue",
-       color = "Survey") +
+       color = "Survey",
+       title = "Yellowman B: Change in Average Tissue Health") +
   theme_light()
 ```
 
@@ -635,7 +630,6 @@ ggplot(yellowmanB_long, aes(x = factor(geno), y = values)) +
 The Yellowman C site shares many of the same genos as at Yellowman A.  The mortality rate, however, is much greater at Yellowman C.
 
 
-*Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, yellowman C 3-Month weighted coral health by geno, echo=FALSE, message=FALSE}
 yellowmanC3_health <- yellowmanC3 %>%
   select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
@@ -669,30 +663,29 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table()
+nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health")
 ```
 
 
-Stressors were present in all but three of the observations.  It is likely this is an important factor in the lower average tissue health at the site.  A six-month survey is not yet available.  It will be interesting to compare the three- to six-month changes at Yellowman C with those at Yellowman A.
+Stressors were present in all but three of the observations.  It is likely stressors are an important factor in the lower average tissue health at the site.  A six-month survey is not yet available for Yellowman C.  In the future, it will be interesting to compare the three- to six-month changes at Yellowman C with those at Yellowman A.
 
 
-*Yellowman C 3-Month Survey: Average Tissue Health Variance*
 ```{r yellowmanC3 boxplot of tissue health by geno, echo=FALSE}
 ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) + 
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
-       caption =  "Adj. Survey Date: 2022-11-12")
+       caption =  "Adj. Survey Date: 2022-11-12",
+       title = "Yellowman C 3-Month Survey: Average Tissue Health Variance")
 ```
 
 
 ### Comparing Yellowman Sites
 
-In the visual below, I have extracted the genotypes present at both Yellowman A and Yellowman C, as of their three-month surveys.  The data suggests that the corals at Yellowman A are out performing those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed during the preceding three months, creating a potentially unequal environment for comparison.
+In the visual below, I have extracted the genotypes present at both Yellowman A and Yellowman C, as of their three-month surveys.  The data suggests that the corals at Yellowman A are out performing those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed during the preceding three months, creating a potentially unequal environment for comparison.  It is unknown if differences in propagation or outplanting techniques existed between the two sites. 
 
 
-*Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys*
 ```{r Comparing YellowmanA 3 with Yellowman C 3, echo=FALSE}
 yellowmanA3C3_health <- yellowmanA3_health %>%
                             mutate(location = "yellowmanA") %>%
@@ -707,12 +700,8 @@ yellowmanA3C3_health %>%
     scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
     labs(x = "Acer Genotype", 
          y = "Percent of Healthy Tissue",
-        color = "Location") 
-
-
- 
-                    
- 
+        color = "Location",
+        title = "Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys") 
 ```
 
 
@@ -721,7 +710,6 @@ yellowmanA3C3_health %>%
 There are a variety of stressors that are detrimental to the success of coral growth.  The majority of these are out of the control of restoration efforts.  Bottom Contact, however, a stressor caused from coral agitation against the seafloor, typically occurs when corals break free from their placements.  While this is unavoidable during storms and wind-reversals, there is an opportunity to reduce the amount of overall bottom contact events through improved adhesives.  New adhesive technologies are expected to be introduced in 2023.  Comparing the percentage of Bottom Contact observations between existing sites and future sites may prove to be a useful indicator of the technology's efficacy and value.
 
 
-*Carl's Hill 3-Month Survey*
 ```{r, carl 3 bottom stressor proportion, echo=FALSE}
 c3bottom_perc <- carl3 %>%
   summarize(N_Outplanted = n(),
@@ -735,10 +723,10 @@ c3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table()
+  nice_table(title = "Carl's Hill 3-Month Survey")
 ```
 
-*Carl's Hill 6-Month Survey*
+
 ```{r carl 6 bottom stressor proportion, echo=FALSE}
 c6bottom_perc <- carl6 %>%
   summarize(N_Outplanted = n(),
@@ -752,11 +740,10 @@ c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table()
+  nice_table(title = "Carl's Hill 6-Month Survey")
 ```
 
 
-*Yellowman B 3-Month Survey*
 ```{r opportunities yellowmanB3 bottom contact, echo=FALSE}
 yb3bottom_perc <- yellowmanB3 %>%
   summarize(N_Outplanted = n(),
@@ -770,10 +757,10 @@ yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table()
+  nice_table(title = "Yellowman B 3-Month Survey")
 ```
 
-*Yellowman B 6-Month Survey*
+
 ```{r opportunities yellowmanB6 bottom contact, echo=FALSE}
 yb6bottom_perc <- yellowmanB6 %>%
   summarize(N_Outplanted = n(),
@@ -787,11 +774,10 @@ yb6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table()
+  nice_table(title = "Yellowman B 6-Month Survey")
 ```
 
 
-*Yellowman C 3-Month Survey*
 ```{r pportunities yellowmanC3 bottom contact, echo=FALSE}
 yc3bottom_perc <- yellowmanC3 %>%
   summarize(N_Outplanted = n(),
@@ -805,7 +791,7 @@ yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table()
+  nice_table(title = "Yellowman C 3-Month Survey")
 ```
 
 
