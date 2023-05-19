@@ -138,7 +138,8 @@ ltsummary %>%
          y = 'Eco-Footprint (m)',
          color = 'Site',
          shape = 'Species',
-         title = 'Change in Ecological Footprints Over Time')
+         title = 'Change in Ecological Footprints Over Time') + 
+  theme(plot.title = element_text(face = "italic"))
 
 ```
 
@@ -153,7 +154,8 @@ ltsummary %>%
          y = 'Total Coral Area (m)',
          color = 'Site',
          shape = 'Species',
-         title = 'Change in Total Coral Area Over Time')
+         title = 'Change in Total Coral Area Over Time') +
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -176,7 +178,8 @@ ltsummary_long %>%
          color = 'Metric',
          shape = 'Species',
          title = 'Long-Term Growth by Site') +
-    guides(color=guide_legend(override.aes=list(shape=15)))
+    guides(color=guide_legend(override.aes=list(shape=15))) + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -238,7 +241,8 @@ ggplot(carl_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
        caption = "Adj. Survey Date: 2022-04-27",
-       title = "Carl's Hill 3-Month Survey: Average Tissue Health Variance")
+       title = "Carl's Hill 3-Month Survey: Average Tissue Health Variance") + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 ### Carl's Hill 6-Month Survey
@@ -292,7 +296,8 @@ ggplot(carl6_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Apal Genotype", 
        y = "Percent of Healthy Tissue",
        caption = "Survey Date: 2022-07-04",
-       title = "Carl's Hill 6-Month Survey: Average Tissue Health Variance")
+       title = "Carl's Hill 6-Month Survey: Average Tissue Health Variance") + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 To better visualize the change in tissue health, I have summarized the average tissue health for each genotype during the three- and six-month surveys. Comparing changes and combining the data from other Apal sites may help create a more diverse sample and reduce site bias.
@@ -323,7 +328,8 @@ ggplot(carl_long, aes(x = factor(geno), y = values)) +
        y = "Percent of Healthy Tissue",
        color = "Survey",
        title = "Carl's Hill: Change in Average Tissue Health") +
-  theme_light()
+  theme_light() + 
+  theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -387,7 +393,8 @@ ggplot(yellowmanA3_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2021-06-23",
-       title = "Yellowman A 3-Month Survey: Average Tissue Health Variance")
+       title = "Yellowman A 3-Month Survey: Average Tissue Health Variance") + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -444,7 +451,8 @@ ggplot(yellowmanA6_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2021-10-12",
-       title = "Yellowman A 6-Month Survey: Average Tissue Health Variance")
+       title = "Yellowman A 6-Month Survey: Average Tissue Health Variance") +
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -475,7 +483,8 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
        y = "Percent of Healthy Tissue",
        color = "Survey",
        title = "Yellowman A: Change in Average Tissue Health") +
-  theme_light()
+  theme_light() + 
+  theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -532,7 +541,8 @@ ggplot(yellowmanB3_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2022-03-24",
-       title = "Yellowman B 3-Month Survey: Average Tissue Health Variance")
+       title = "Yellowman B 3-Month Survey: Average Tissue Health Variance") + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -589,7 +599,8 @@ ggplot(yellowmanB6_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2022-06-30",
-       title = "Yellowman B 6-Month Survey: Average Tissue Health Variance")
+       title = "Yellowman B 6-Month Survey: Average Tissue Health Variance") +
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -620,7 +631,8 @@ ggplot(yellowmanB_long, aes(x = factor(geno), y = values)) +
        y = "Percent of Healthy Tissue",
        color = "Survey",
        title = "Yellowman B: Change in Average Tissue Health") +
-  theme_light()
+  theme_light() +
+  theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -677,7 +689,8 @@ ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) +
   labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        caption =  "Adj. Survey Date: 2022-11-12",
-       title = "Yellowman C 3-Month Survey: Average Tissue Health Variance")
+       title = "Yellowman C 3-Month Survey: Average Tissue Health Variance") +
+  theme(plot.title = element_text(face = "italic"))
 ```
 
 
@@ -701,7 +714,8 @@ yellowmanA3C3_health %>%
     labs(x = "Acer Genotype", 
          y = "Percent of Healthy Tissue",
         color = "Location",
-        title = "Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys") 
+        title = "Comparing Average Tissue Health Between Acer Sites From 3-Month Surveys") +
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
