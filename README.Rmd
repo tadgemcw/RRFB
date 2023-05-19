@@ -226,7 +226,8 @@ carl3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health") %>%
+  colformat_num(digits = 1)
 ```
 
 
@@ -282,7 +283,8 @@ carl6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 The changes in variance between the three- and six-month surveys often correspond with the addition of new stressors to some of the observations. 
@@ -379,7 +381,8 @@ yellowmanA3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -437,7 +440,8 @@ yellowmanA6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -527,7 +531,8 @@ yellowmanB3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -585,7 +590,8 @@ yellowmanB6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -675,7 +681,8 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health")
+nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -737,7 +744,8 @@ c3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table(title = "Carl's Hill 3-Month Survey")
+  nice_table(title = "Carl's Hill 3-Month Survey") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -754,7 +762,8 @@ c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table(title = "Carl's Hill 6-Month Survey")
+  nice_table(title = "Carl's Hill 6-Month Survey") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -771,7 +780,8 @@ yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table(title = "Yellowman B 3-Month Survey")
+  nice_table(title = "Yellowman B 3-Month Survey") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -788,7 +798,8 @@ yb6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table(title = "Yellowman B 6-Month Survey")
+  nice_table(title = "Yellowman B 6-Month Survey") %>% 
+  colformat_num(digits = 1)
 ```
 
 
@@ -805,7 +816,8 @@ yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  nice_table(title = "Yellowman C 3-Month Survey")
+  nice_table(title = "Yellowman C 3-Month Survey") %>% 
+  colformat_num(digits = 1)
 ```
 
 
