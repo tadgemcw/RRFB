@@ -1,8 +1,8 @@
 ---
 title: "Analysis of Coral Restoration Efforts"
-subtitle: "In Collaboration with Bonaire Reef Renewal Foundation"
+subtitle: "A Collaboration with Bonaire Reef Renewal Foundation"
 author: "Tadge McWilliams"
-date: "May 15th, 2023"
+date: "May 18th, 2023"
 output: 
   html_document:
     toc: TRUE
@@ -14,11 +14,25 @@ output:
 library(readxl)
 library(tidyverse)
 library(pander)
-library(knitr)
+library(flextable)
+library(rempsyc)
 ```
 
-## Introduction
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  The following analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.*
+
+![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
+
+
+
+## Summary
+The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes in the ecological footprints of the outplanting locations.  By calculating mortality rates and average tissue health, I was able to identify which genotypes performed better than others and begin to track the changes in health over time.  While further work is needed, this could lay the framework for future models.  
+
+## Methodology
+
+This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by BRRF.  The ecological footprint data was collected via photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.
+Mortality rates are a standard calculation of (corals present - corals outplanted) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 40%, 65%, 87%, and 100%) is used to calculate the average tissue health.  Note that the calculation does not include dead observations.[^1]
+All calculations and visualizations are performed using R.  R packages for this project include readxl, tidyverse, pander, flextable, and rempsyc.  The report is formated in Markdown, and all content has been pushed to a github repository.
+
+[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
 
 ```{r, loading data, echo=FALSE}
@@ -168,11 +182,9 @@ ltsummary_long %>%
 
 ## Species: Apal
 ### Carl's Hill 3-Month Survey
-The summary statistics below were generated from a survey of coral health between April 11th, 2021 and May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the outplanted corals or a survey error.
+The summary statistics below were generated from a survey of coral health from April 11th, 2021 to May 4th, 2021, approximately three months after the initial outplanting of corals at Carl's Hill.  Note that Genos #16 and #7 appear to have negative mortality rates.  These statistics were caused because more observations were recorded during the 3-month survey than were originally outplanted.  It is unknown if this was caused by a division of the outplanted corals or a survey error.
 
-Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  Note that the weighted average of tissue health does not include dead observations. [^1]
-
-[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
+Apart from the mortality rate, an important universal metric included in the survey is to record the percentage of healthy coral tissue for each observation.  Predation, disease, and other environmental factors are detrimental to coral growth.  Below, I have created a weighted average of tissue health by genotype.  
 
 *Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tissue Health*
 ```{r, carls hill 3 month weighted coral health by geno, echo=FALSE, message=FALSE}
@@ -208,7 +220,7 @@ carl3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 
 
@@ -261,7 +273,7 @@ carl6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 The changes in variance between the three- and six-month surveys often correspond with the addition of stressors to some of the observations. 
 
@@ -353,7 +365,7 @@ yellowmanA3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
@@ -406,7 +418,7 @@ yellowmanA6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 The variance of tissue health below remains relatively stable.  Most corals have decreased in average health, but the interquartile range of observations is fairly close.
 
@@ -489,7 +501,7 @@ yellowmanB3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 
 With the exception of geno #9, most genotypes have relatively high average tissue health. 
@@ -542,7 +554,7 @@ yellowmanB6_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 
 There are tissue health many outliers in the six-month survey. Disease, ciliate, and fireworm stressors were not uncommon.  However, geno #9 had the lowest average tissue health of any Yellowman B geno, but only one fireworm stressor was recorded out of the 50 corals observed.
@@ -624,7 +636,7 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
-pander()
+nice_table()
 ```
 
 Stressors were present in all but three of the observations.  It is likely this is an important factor in the lower average tissue health at the site.  A six-month survey is not yet available.  It will be interesting to compare the three- to six-month changes at Yellowman C with those at Yellowman A.
@@ -687,7 +699,7 @@ c3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  pander()
+  nice_table()
 ```
 
 *Carl's Hill 6-Month Survey*
@@ -704,7 +716,7 @@ c6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  pander()
+  nice_table()
 ```
 
 
@@ -722,7 +734,7 @@ yb3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  pander()
+  nice_table()
 ```
 
 *Yellowman B 6-Month Survey*
@@ -739,7 +751,7 @@ yb6bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  pander()
+  nice_table()
 ```
 
 
@@ -757,7 +769,7 @@ yc3bottom_perc %>% rename("# Surveyed" = N_Outplanted,
                        "Total Stressors" = Total_Stressors,
                         "Bottom Contact" = Bottom_Contact,
                        "Percent of Surveyed" = Percent_of_Total) %>%
-  pander()
+  nice_table()
 ```
 
 
