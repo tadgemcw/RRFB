@@ -24,11 +24,11 @@ library(rempsyc)
 
 
 ## Summary
-The goal of this project is to assist [Reef Renewal Bonaire](https://www.reefrenewalbonaire.org) (RRB) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes to the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of climate change.  Through mortality and average tissue health calculations, I was able to identify which genotypes are performing better than others and begin to track the changes in tissue health over time.  While more analysis is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
+The goal of this project is to assist [Reef Renewal Bonaire](https://www.reefrenewalbonaire.org) (RRB) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes to the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of climate change.  Through mortality and average tissue health calculations, I was able to identify which genotypes are performing better than others and begin to track the changes in tissue health over time.  While more analysis is needed, I hope this project will lead to the development of future models from which RRB and others can further their work.
 
 ## Methodology
 
-This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by BRRF.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.  
+This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The Carl's Hill and Yellowman data was provided after detailed three- and six-month surveys of the outplanted sites.  
 Mortality rates are a standard calculation of (corals present - corals outplanted) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 40%, 65%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations, or those with 0% tissue health.[^1]
 All calculations and visualizations are performed using R.  R packages for this project include readxl, dplyr, ggplot2, flextable, and rempsyc.  The report is formatted in Markdown, and all versions have been pushed to a github repository.
 
@@ -124,7 +124,7 @@ ltsummary <- read_excel("Monitoring Summary.xlsx",
 ### Removing NAs  
 ltsummary <- ltsummary %>% drop_na(eco_footprint)
 ```
-The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from BRRF's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
+The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from RRB's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
 
 ```{r ecological footprint, echo=FALSE}
 
@@ -495,7 +495,7 @@ ggplot(yellowmanA_long, aes(x = factor(geno), y = values)) +
 ### Yellowman B 3-Month Survey
 
 
-At Yellowman B, BRRF outplanted different genotypes from those at Yellowman A.  Only geno #1 is shared between Yellowman A and Yellowman B.
+At Yellowman B, RRB outplanted different genotypes from those at Yellowman A.  Only geno #1 is shared between Yellowman A and Yellowman B.
 
 
 ```{r yellowmanB3 calculating B3 weighted coral health by geno, echo=FALSE, message=FALSE}
