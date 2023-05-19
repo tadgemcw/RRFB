@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Coral Restoration Efforts"
-subtitle: "A Collaboration with Bonaire Reef Renewal Foundation"
+subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
 date: "May 19th, 2023"
 output: 
@@ -24,7 +24,7 @@ library(rempsyc)
 
 
 ## Summary
-The goal of this project is to assist [Bonaire Reef Renewal Foundation](https://www.reefrenewalbonaire.org) (BRRF) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes to the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of climate change.  Through mortality and average tissue health calculations, I was able to identify which genotypes are performing better than others and begin to track the changes in tissue health over time.  While more analysis is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
+The goal of this project is to assist [Reef Renewal Bonaire](https://www.reefrenewalbonaire.org) (RRB) in developing a successful, data driven program to efficiently introduce new, "reef-ready" corals into Bonaire's reef systems.  By analyzing survey data from multiple coral reef outplanting locations, I attempt to provide insights into the viability of two coral species, their genotypes, and the overall changes to the ecological footprints of the restored reef locations.  Special interest was given to the performance of coral growth on the geno-level.  The successful propagation and growth of multiple genotypes is central to the diversity of the species.  Additionally, if certain genotypes prove to be more resistant to temperature fluctuation than others, they may become vitual to the long-term success of the species as we face the realities of climate change.  Through mortality and average tissue health calculations, I was able to identify which genotypes are performing better than others and begin to track the changes in tissue health over time.  While more analysis is needed, I hope this project will lead to the development of future models from which BRRF and others can further their work.
 
 ## Methodology
 
