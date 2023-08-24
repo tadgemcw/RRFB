@@ -2,7 +2,7 @@
 title: "Analysis of Coral Restoration Efforts"
 subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
-date: "August 14th, 2023"
+date: "August 23rd, 2023"
 output: 
   html_document:
     toc: TRUE
