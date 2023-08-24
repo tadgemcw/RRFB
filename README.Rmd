@@ -668,7 +668,7 @@ nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tis
 ```{r Yellowman B 6 month mortality}
 ggplot(yellowmanB6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
