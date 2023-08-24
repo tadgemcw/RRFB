@@ -23,6 +23,7 @@ library(tidyverse)
 library(pander)
 library(flextable)
 library(rempsyc)
+library(RColorBrewer)
 ```
 
 
@@ -239,6 +240,17 @@ nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tis
 
 ```
 
+```{r carls hill 3 month mortality}
+ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Carl's Hill 3-Month Mortality Rate") + 
+  theme(legend.position = "none")
+
+```
 
 
 Outliers can easily skew the averages of an aggregate summary.  The plot below identifies the range of tissue health by genotype.  While the average tissue health of genos #1, #9, and #21 is slightly depressed from a few poorly performing outliers, it appears that genos #14, #16, #18, #19, and #22 are generally less resilient than the others.
@@ -294,6 +306,19 @@ carl6_agg_pretty %>% rename("Species" = species,
                        "Avg. Health" = avg_health) %>% 
 nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
   colformat_num(digits = 1)
+```
+
+
+```{r carls hill 3 month mortality}
+ggplot(carl6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Carl's Hill 6-Month Mortality Rate")+ 
+  theme(legend.position = "none")
+
 ```
 
 The changes in variance between the three- and six-month surveys often correspond with the addition of new stressors to some of the observations. 
@@ -395,6 +420,20 @@ nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 
+```{r Yellowman A 3 Month mortality}
+
+ggplot(yellowmanA3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Yellowman A 3-Month Mortality Rate")+ 
+  theme(legend.position = "none")
+
+```
+
+
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
 
 
@@ -451,6 +490,17 @@ yellowmanA6_agg_pretty %>% rename("Species" = species,
                        "Avg. Health" = avg_health) %>% 
 nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
   colformat_num(digits = 1)
+```
+
+```{r Yellowman A 6 month mortality}
+ggplot(yellowmanA6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Yellowman A 6-Month Mortality Rate")+ 
+  theme(legend.position = "none")
 ```
 
 
@@ -544,6 +594,17 @@ nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tis
   colformat_num(digits = 1)
 ```
 
+```{r Yellowman B 3 month mortality}
+ggplot(yellowmanB3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Yellowman B 3-Month Mortality Rate")+ 
+  theme(legend.position = "none")
+```
+
 
 With the exception of geno #9, most genotypes have relatively high average tissue health. 
 
@@ -601,6 +662,18 @@ yellowmanB6_agg_pretty %>% rename("Species" = species,
                        "Avg. Health" = avg_health) %>% 
 nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
   colformat_num(digits = 1)
+```
+
+
+```{r Yellowman B 6 month mortality}
+ggplot(yellowmanB6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Yellowman B 6-Month Mortality Rate")+ 
+  theme(legend.position = "none")
 ```
 
 
@@ -692,6 +765,18 @@ yellowmanC3_agg_pretty %>% rename("Species" = species,
                        "Avg. Health" = avg_health) %>% 
 nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tissue Health") %>% 
   colformat_num(digits = 1)
+```
+
+
+```{r Yellowman C 3 Month Mortality}
+ggplot(yellowmanC3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype",
+       title="Yellowman C 3-Month Mortality Rate")+ 
+  theme(legend.position = "none")
 ```
 
 
