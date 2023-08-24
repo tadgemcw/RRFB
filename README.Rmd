@@ -243,7 +243,7 @@ nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tis
 ```{r carls hill 3 month mortality}
 ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -309,10 +309,10 @@ nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 
-```{r carls hill 3 month mortality}
+```{r carls hill 6 month mortality}
 ggplot(carl6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -424,7 +424,7 @@ nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tis
 
 ggplot(yellowmanA3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -495,7 +495,7 @@ nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tis
 ```{r Yellowman A 6 month mortality}
 ggplot(yellowmanA6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -597,7 +597,7 @@ nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tis
 ```{r Yellowman B 3 month mortality}
 ggplot(yellowmanB3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -668,7 +668,7 @@ nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tis
 ```{r Yellowman B 6 month mortality}
 ggplot(yellowmanB6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -771,7 +771,7 @@ nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tis
 ```{r Yellowman C 3 Month Mortality}
 ggplot(yellowmanC3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80)) +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype",
@@ -799,12 +799,33 @@ ggplot(yellowmanC3_health, aes(x = factor(geno), y = weighted_health)) +
 
 In the visual below, I have extracted the genotypes present at both Yellowman A and Yellowman C, as of their three-month surveys.  The data suggests that the corals at Yellowman A are out performing those at Yellowman C.  One noteworthy difference is that the Yellowman A survey was conducted in June 2021 while the Yellowman C survey was conducted in November 2022.  Seasonal water temperatures would have differed during the preceding three months, creating a potentially unequal environment for comparison.  It is unknown if differences in propagation or outplanting techniques existed between the two sites. 
 
-
-```{r Comparing YellowmanA 3 with Yellowman C 3}
+```{r comparing a and c mortality}
 yellowmanA3C3_health <- yellowmanA3_health %>%
                             mutate(location = "yellowmanA") %>%
                             bind_rows(yellowmanC3_health)
 yellowmanA3C3_health <- yellowmanA3C3_health %>% replace_na(list(location = 'yellowmanC'))
+
+yellowmanA3C3_agg <- yellowmanA3C3_health %>% 
+  filter(geno %in% yellowmanA3_health$geno & geno %in% yellowmanC3_health$geno) %>%
+  group_by(species, geno, location) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+              avg_health = mean(weighted_health))
+
+ggplot(yellowmanA3C3_agg, aes(x=factor(geno), y=mortality_rate, fill=location)) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
+  scale_fill_discrete(labels=c('Yellowman A', 'Yellowman C')) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Location",
+       title="Yellowman B 6-Month Mortality Rate")
+```
+
+
+```{r Comparing YellowmanA 3 with Yellowman C 3}
+
 
 yellowmanA3C3_health %>% 
   filter(geno %in% yellowmanA3_health$geno & geno %in% yellowmanC3_health$geno) %>%
