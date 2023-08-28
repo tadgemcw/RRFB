@@ -16,7 +16,6 @@ opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
 
-
 ```{r, load libraries, include=FALSE}
 library(readxl)
 library(tidyverse)
@@ -133,6 +132,7 @@ ltsummary <- read_excel("Monitoring Summary.xlsx",
 ### Removing NAs  
 ltsummary <- ltsummary %>% drop_na(eco_footprint)
 ```
+
 The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from RRB's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
 
 ```{r ecological footprint}
