@@ -433,7 +433,6 @@ ggplot(yellowmanA3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))
 
 ```
 
-
 The plot below identifies the range of tissue health by genotype.  Few outliers help to confirm the average health statistics are representative of each geno's viability.
 
 
