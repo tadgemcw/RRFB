@@ -1,0 +1,256 @@
+---
+title: "Report"
+author: "Tadge McWilliams"
+date: "2023-09-30"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float:
+      collapsed: FALSE
+---
+
+```{r global settings, setup, include=FALSE}
+library(knitr) #global settings
+opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{r, load libraries, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(pander)
+library(flextable)
+library(rempsyc)
+library(RColorBrewer)
+```
+
+
+```{r, loading data}
+setwd("~/Documents/Data Science/Reef Renewal Bonaire")
+
+###Monitoring Summary
+ltsummary <- read_excel("Monitoring Summary.xlsx", 
+                    sheet = 4, 
+                    range = 'A3:N24',
+                    col_names = c("site_name", "site_code", "species", "op_date", "subsite", 
+                                  "survey_date","duration", "time_code", "eco_footprint",
+                                  "tot_coral_area", "restored_area", "perc_coral_cover", 
+                                  "coral_density", "restored_size_cm"))
+
+##### Acer Data
+# Mi Dushi I Survey
+midushi13 <- read_excel("Mi Dushi I Acer Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q71',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                        "n_outplanted","n_present", "n_lost", "health_0",
+                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                        "pred_stressor"))
+
+# Punt Vierkant 3-Month Survey
+puntv3 <- read_excel("PV_Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'A2:Y92',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+# Punt Vierkant 6-Month Survey
+puntv6 <- read_excel("PV_Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'A2:Y92',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+# Yellowman A 3-Month Survey
+yellowmanA3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q136',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                        "n_outplanted","n_present", "n_lost", "health_0",
+                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                        "pred_stressor"))
+
+# Yellowman A 6-Month Survey
+yellowmanA6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'A2:P120',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                        "n_outplanted","n_present", "n_lost", "health_0",
+                                        "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                        "avg_health", "pred_stressor"))
+
+# Yellowman B 3-Month Survey
+yellowmanB3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 4, 
+                    range = 'A2:Y83',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+# Yellowman B 6-Month Survey
+yellowmanB6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 5, 
+                    range = 'A2:Z82',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", "bottom_contact", 
+                                  "fireworm", "snail", "cyanob", "competition", "unknown", "n_stressors"))
+
+# Yellowman C 3-Month Survey
+yellowmanC3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
+                    sheet = 6, 
+                    range = 'A2:Z34',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", 
+                                  "bottom_contact", "fireworm", "snail", "cyanob", "competition", "unknown",
+                                  "n_stressors"))
+
+#### Apal Data
+# Carl 3-Month Survey
+carl3 <- read_excel("Carls Hill Monitoring Database.xlsx", 
+                    sheet = 2, 
+                    range = 'A2:Y86',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+
+# Carl 6-Month Survey
+carl6 <- read_excel("Carls Hill Monitoring Database.xlsx", 
+                    sheet = 3, 
+                    range = 'A2:Z51',
+                    col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
+                                  "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "cyanob", "sedimentation", "unknown", "n_stressors"))
+
+# Knife A 3-Month Survey
+knifeA3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q39',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Knife A 5-Month Survey
+knifeA5 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'C2:Q39',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Knife A 6-Month Survey
+knifeA6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                          sheet = 4, 
+                          range = 'C2:Q39',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Knife B 3-Month Survey
+knifeB3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                          sheet = 5, 
+                          range = 'C2:Q124',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Knife B 6-Month Survey
+knifeB6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                          sheet = 6, 
+                          range = 'C2:Q115',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Knife C 3-Month Survey
+knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                    sheet = 7, 
+                    range = 'A2:Z86',
+                    col_names = c("date", "bond", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
+                                  "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))
+
+# Knife C 6-Month Survey
+knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+                    sheet = 8, 
+                    range = 'A2:Z86',
+                    col_names = c("date", "bond", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
+                                  "disease", "ciliate", "bottom_contact", "fireworm",
+                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))
+
+# Oil Slick 1-Month Survey
+oilslick1 <- read_excel("Oil Slick Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q29',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Oil Slick 7-Month Survey
+oilslick7 <- read_excel("Oil Slick Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'C2:Q29',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# Oil Slick 13-Month Survey
+oilslick13 <- read_excel("Oil Slick Monitoring Database.xlsx", 
+                          sheet = 4, 
+                          range = 'C2:Q29',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# South Bay II .5-Month Survey
+southbay0.5 <- read_excel("South Bay II Monitoring Database.xlsx", 
+                          sheet = 2, 
+                          range = 'C2:Q67',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+
+# South Bay II 18-Month Survey
+southbay18 <- read_excel("South Bay II Monitoring Database.xlsx", 
+                          sheet = 3, 
+                          range = 'C2:Q71',
+                          col_names = c("date", "duration", "species", "geno", "cluster", 
+                                  "n_outplanted","n_present", "n_lost", "health_0",
+                                  "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
+                                  "pred_stressor"))
+```
+
+
+![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
+
+

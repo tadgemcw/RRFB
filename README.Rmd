@@ -241,7 +241,7 @@ nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 ```{r carls hill 3 month mortality}
-ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
+ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate, fill= factor(geno))) +
   geom_col() +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
