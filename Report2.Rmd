@@ -1,5 +1,6 @@
 ---
-title: "Report"
+title: "Analysis of Coral Restoration Efforts"
+subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
 date: "2023-09-30"
 output: 
@@ -250,9 +251,6 @@ southbay18 <- read_excel("South Bay II Monitoring Database.xlsx",
 ```
 
 
-![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
-
-
 ```{r creating functions}
 
 # Calculating average tissue health function.
@@ -269,6 +267,17 @@ x %>%
          weighted_health = (sum(Health25 + Health50 + Health75 + 
                                   Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
   drop_na(weighted_health)
+}
+
+# Calculating aggregate table function.  Must take tissue_health function input.
+agg_table <- function(x) {
+x %>%
+    group_by(species, geno) %>%
+    summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+              avg_health = mean(weighted_health)) %>%
+    arrange(mortality_rate)
 }
 
 # Creating ggplot function for mortality rate plot.
@@ -292,8 +301,52 @@ gg_tissue_health <- function(x) {
     theme(plot.title = element_text(face = "italic"))
 }
 
-
+#Creating function for nice_table formatting. Input must be the aggregate object.
+table_format <- function(x) {
+x$mortality_rate <- paste0(round(x$mortality_rate, 2), "%")
+x$avg_health <- paste0(round(x$avg_health, 2), "%")
+x %>% rename("Species" = species, 
+                       "Geno" = geno, 
+                       "# Outplanted" = num_outplanted, 
+                       "# Survived" = num_survived, 
+                       "Mortality Rate" = mortality_rate,
+                       "Avg. Health" = avg_health) %>% 
+  colformat_num(digits = 1)
+}
 
 ```
 
 
+![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
+
+## Summary
+
+## Methodology
+
+This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided after detailed surveys of the outplanted sites.  
+Mortality rates are a standard calculation of (corals present - dead corals) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
+All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *flextable*, and *rempsyc*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
+
+[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
+
+## Overview of Restoration Efforts
+
+## Species: Acer
+Mi Dushi I: 13-month
+Punt Vierkant: 3-month, 6-month
+Yellowman A: 3-month, 6-month
+Yellowman B: 3-month, 6-month
+Yellowman C: 3-month
+
+## Species: Apal
+Carl’s Hill: 3-month, 6-month
+Knife I A: 1-month, 5-month, 6-month
+Knife I B: 3-month, 6-month
+Knife I C: 3-month, 6-month
+Oil Slick: 1-month, 7-month, 13-month
+Southbay II: 0.5-month, 18-month
+
+## Actionable Opportunities
+Glue: Cement vs Epoxy
+
+## Conclusions
