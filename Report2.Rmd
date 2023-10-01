@@ -23,7 +23,6 @@ library(rempsyc)
 library(RColorBrewer)
 ```
 
-
 ```{r, loading data}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 
@@ -252,5 +251,49 @@ southbay18 <- read_excel("South Bay II Monitoring Database.xlsx",
 
 
 ![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
+
+
+```{r creating functions}
+
+# Calculating average tissue health function.
+tissue_health <- function(x) {
+x %>%
+  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  rowwise() %>%
+  mutate(Health0 = sum(health_0, na.rm = TRUE),
+         Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
+         Health50 = sum(health_q2 * 0.375, na.rm = TRUE),
+         Health75 = sum(health_q3 * 0.625, na.rm = TRUE),
+         Health99 = sum(health_q4 * 0.87, na.rm = TRUE),
+         Health100 = sum(health_100, na.rm = TRUE),
+         weighted_health = (sum(Health25 + Health50 + Health75 + 
+                                  Health99 + Health100, na.rm = TRUE) / (n_present - Health0)) * 100) %>%
+  drop_na(weighted_health)
+}
+
+# Creating ggplot function for mortality rate plot.
+gg_mortality <- function(x) {
+ggplot(x, aes(x=factor(geno), y=mortality_rate, fill= factor(geno))) +
+  geom_col() +
+  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype") + 
+  theme(legend.position = "none")
+}
+
+# Creating ggplot function for average tissue health plot.
+gg_tissue_health <- function(x) {
+  ggplot(x, aes(x = factor(geno), y = weighted_health)) +
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Apal Genotype", 
+       y = "Percent of Healthy Tissue") + 
+    theme(plot.title = element_text(face = "italic"))
+}
+
+
+
+```
 
 
