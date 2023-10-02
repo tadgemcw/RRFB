@@ -44,7 +44,8 @@ midushi13 <- read_excel("Mi Dushi I Acer Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                         "n_outplanted","n_present", "n_lost", "health_0",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                        "pred_stressor"))
+                                        "pred_stressor")) %>%
+            mutate(site = "Mi Dushi")
 
 # Punt Vierkant 3-Month Survey
 puntv3 <- read_excel("PV_Monitoring Database.xlsx", 
@@ -54,7 +55,8 @@ puntv3 <- read_excel("PV_Monitoring Database.xlsx",
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors")) %>%
+            mutate(site = "Punt Vierkant")
 
 # Punt Vierkant 6-Month Survey
 puntv6 <- read_excel("PV_Monitoring Database.xlsx", 
@@ -64,7 +66,8 @@ puntv6 <- read_excel("PV_Monitoring Database.xlsx",
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors")) %>%
+            mutate(site = "Punt Vierkant")
 
 # Yellowman A 3-Month Survey
 yellowmanA3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -73,7 +76,8 @@ yellowmanA3 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                         "n_outplanted","n_present", "n_lost", "health_0",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                        "pred_stressor"))
+                                        "pred_stressor")) %>%
+            mutate(site = "Yellowman A")
 
 # Yellowman A 6-Month Survey
 yellowmanA6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -82,7 +86,8 @@ yellowmanA6 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                         "n_outplanted","n_present", "n_lost", "health_0",
                                         "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                        "avg_health", "pred_stressor"))
+                                        "avg_health", "pred_stressor")) %>%
+            mutate(site = "Yellowman A")
 
 # Yellowman B 3-Month Survey
 yellowmanB3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -92,7 +97,8 @@ yellowmanB3 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors")) %>%
+            mutate(site = "Yellowman B")
 
 # Yellowman B 6-Month Survey
 yellowmanB6 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -102,7 +108,8 @@ yellowmanB6 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", "bottom_contact", 
-                                  "fireworm", "snail", "cyanob", "competition", "unknown", "n_stressors"))
+                                  "fireworm", "snail", "cyanob", "competition", "unknown", "n_stressors")) %>%
+            mutate(site = "Yellowman B")
 
 # Yellowman C 3-Month Survey
 yellowmanC3 <- read_excel("Yellowman Acer Monitoring Database.xlsx", 
@@ -113,7 +120,8 @@ yellowmanC3 <- read_excel("Yellowman Acer Monitoring Database.xlsx",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "rm_by_dead", "disease", "ciliate", 
                                   "bottom_contact", "fireworm", "snail", "cyanob", "competition", "unknown",
-                                  "n_stressors"))
+                                  "n_stressors")) %>%
+            mutate(site = "Yellowman C")
 
 #### Apal Data
 # Carl 3-Month Survey
@@ -124,7 +132,8 @@ carl3 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "perc_dead_tissue", "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors"))
+                                  "snail", "cliona", "competition", "unknown", "none", "n_stressors")) %>%
+            mutate(site = "Carl's Hill")
 
 # Carl 6-Month Survey
 carl6 <- read_excel("Carls Hill Monitoring Database.xlsx", 
@@ -135,7 +144,8 @@ carl6 <- read_excel("Carls Hill Monitoring Database.xlsx",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
                                   "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "cyanob", "sedimentation", "unknown", "n_stressors"))
+                                  "snail", "cyanob", "sedimentation", "unknown", "n_stressors")) %>%
+            mutate(site = "Carl's Hill")
 
 # Knife A 3-Month Survey
 knifeA3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -144,7 +154,8 @@ knifeA3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "Knife A")
 
 # Knife A 5-Month Survey
 knifeA5 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -153,7 +164,8 @@ knifeA5 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor"))%>%
+            mutate(site = "Knife A")
 
 # Knife A 6-Month Survey
 knifeA6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -162,7 +174,8 @@ knifeA6 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor"))%>%
+            mutate(site = "Knife A")
 
 # Knife B 3-Month Survey
 knifeB3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -171,7 +184,8 @@ knifeB3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor"))%>%
+            mutate(site = "Knife B")
 
 # Knife B 6-Month Survey
 knifeB6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -180,7 +194,8 @@ knifeB6 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor"))%>%
+            mutate(site = "Knife B")
 
 # Knife C 3-Month Survey
 knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -191,7 +206,8 @@ knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
                                   "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))
+                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))%>%
+            mutate(site = "Knife C")
 
 # Knife C 6-Month Survey
 knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
@@ -202,7 +218,8 @@ knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
                                   "disease", "ciliate", "bottom_contact", "fireworm",
-                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))
+                                  "snail", "competition", "sedimentation", "unknown", "n_stressors"))%>%
+            mutate(site = "Knife C")
 
 # Oil Slick 1-Month Survey
 oilslick1 <- read_excel("Oil Slick Monitoring Database.xlsx", 
@@ -211,7 +228,8 @@ oilslick1 <- read_excel("Oil Slick Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "Oil Slick Leap")
 
 # Oil Slick 7-Month Survey
 oilslick7 <- read_excel("Oil Slick Monitoring Database.xlsx", 
@@ -220,7 +238,8 @@ oilslick7 <- read_excel("Oil Slick Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "Oil Slick Leap")
 
 # Oil Slick 13-Month Survey
 oilslick13 <- read_excel("Oil Slick Monitoring Database.xlsx", 
@@ -229,7 +248,8 @@ oilslick13 <- read_excel("Oil Slick Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "Oil Slick Leap")
 
 # South Bay II .5-Month Survey
 southbay0.5 <- read_excel("South Bay II Monitoring Database.xlsx", 
@@ -238,7 +258,8 @@ southbay0.5 <- read_excel("South Bay II Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "South Bay II")
 
 # South Bay II 18-Month Survey
 southbay18 <- read_excel("South Bay II Monitoring Database.xlsx", 
@@ -247,7 +268,8 @@ southbay18 <- read_excel("South Bay II Monitoring Database.xlsx",
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
-                                  "pred_stressor"))
+                                  "pred_stressor")) %>%
+            mutate(site = "South Bay II")
 ```
 
 
@@ -296,7 +318,7 @@ gg_tissue_health <- function(x) {
   ggplot(x, aes(x = factor(geno), y = weighted_health)) +
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
-  labs(x = "Apal Genotype", 
+  labs(x = "Genotype", 
        y = "Percent of Healthy Tissue") + 
     theme(plot.title = element_text(face = "italic"))
 }
@@ -337,6 +359,38 @@ Punt Vierkant: 3-month, 6-month
 Yellowman A: 3-month, 6-month
 Yellowman B: 3-month, 6-month
 Yellowman C: 3-month
+
+```{r combining acer sites}
+# Aligning class types
+puntv3$cluster <- str_remove_all(puntv3$cluster, "C") %>% as.numeric()
+puntv6$cluster <- str_remove_all(puntv6$cluster, "C") %>% as.numeric()
+yellowmanA3$date <- as.POSIXct(yellowmanA3$date)
+yellowmanA3$cluster <- str_remove_all(yellowmanA3$cluster, "C") %>% as.numeric()
+yellowmanA6$cluster <- str_remove_all(yellowmanA6$cluster, "C") %>% as.numeric()
+yellowmanB3$date <- as.POSIXct(yellowmanB3$date)
+yellowmanB3$cluster <- str_remove_all(yellowmanB3$cluster, "C") %>% as.numeric()
+
+# Binding Acer rows
+acer_all <- bind_rows(midushi13, puntv3, puntv6, yellowmanA3, yellowmanA6,
+                      yellowmanB3, yellowmanB6, yellowmanC3) 
+
+# Changing duration to numeric.
+acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
+
+```
+
+
+```{r plotting acer_all data}
+acer_all %>%
+  group_by(site) %>%
+  filter(duration == max(duration)) %>%
+tissue_health() %>%
+  agg_table() %>%
+  gg_mortality()
+```
+
+
+
 
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
