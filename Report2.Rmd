@@ -425,7 +425,7 @@ acer_latest %>%
   geom_boxplot() +
   scale_fill_viridis(discrete = FALSE, option = "mako") +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
-  labs(x = "Genotype", 
+  labs(x = "Acer Genotype", 
        y = "Percent of Healthy Tissue",
        fill = "Median Health",
        title = "Acer Average Tissue Health",
@@ -465,7 +465,7 @@ acer_latest %>%
     #scale_fill_brewer(palette = "GnBu") +
     #scale_fill_viridis(discrete = TRUE, option = "mako") +
     scale_y_continuous(labels=scales::percent_format(scale=1)) +
-    labs(x="Genotype", 
+    labs(x="Acer Genotype", 
        y="Mortality Rate",
        fill="",
        title="Genomic Mortality Rate by Site",
@@ -477,7 +477,7 @@ acer_latest %>%
 
 
 
-```{r acer 3- to 6-month changes}
+```{r acer 3- to 6-month mortality}
 comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
 
 acer_all %>%
@@ -490,9 +490,20 @@ acer_all %>%
             avg_health = mean(weighted_health)) %>%
   ggplot(aes(x = factor(geno), y = mortality_rate)) +
     geom_point(aes(color = factor(duration))) +
-    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open")) +
-    scale_y_continuous(limits = c(0, 100), 
-                     breaks = seq(0, 100, by = 5)) 
+    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open"))
+```
+```{r acer comparison 3- to 6-month}
+
+acer_all %>%
+  tissue_health() %>%
+  ggplot(aes(x = factor(geno), y = weighted_health, color = site)) + 
+    geom_point() +
+    #scale_color_discrete(labels = c("Yellowman A", "Yellowman C")) +
+    labs(x = "Acer Genotype", 
+         y = "Percent of Healthy Tissue",
+        color = "Site",
+        title = "") +
+    theme(plot.title = element_text(face = "italic"))
 ```
 
 
