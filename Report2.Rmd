@@ -2,7 +2,7 @@
 title: "Analysis of Coral Restoration Efforts"
 subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
-date: "2023-09-30"
+date: "Updated 2023-09-30"
 output: 
   html_document:
     toc: TRUE
@@ -22,6 +22,9 @@ library(pander)
 library(flextable)
 library(rempsyc)
 library(RColorBrewer)
+#display.brewer.all(colorblindFriendly = TRUE)
+library(viridisLite)
+library(viridis)
 ```
 
 ```{r, loading data}
@@ -278,7 +281,7 @@ southbay18 <- read_excel("South Bay II Monitoring Database.xlsx",
 # Calculating average tissue health function.
 tissue_health <- function(x) {
 x %>%
-  select(species, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100) %>%
+  select(species, duration, geno, n_outplanted, n_present, health_0, health_q1, health_q2, health_q3, health_q4, health_100, site) %>%
   rowwise() %>%
   mutate(Health0 = sum(health_0, na.rm = TRUE),
          Health25 = sum(health_q1 * 0.125, na.rm = TRUE),
@@ -303,18 +306,19 @@ x %>%
 }
 
 # Creating ggplot function for mortality rate plot.
-gg_mortality <- function(x) {
-ggplot(x, aes(x=factor(geno), y=mortality_rate, fill= factor(geno))) +
+gg_mortality <- function(x,...) {
+ggplot(x, aes(x=factor(geno), y=mortality_rate, fill= mortality_rate)) +
   geom_col() +
-  scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
+  scale_y_continuous(labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
        fill="Genotype") + 
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+    theme(plot.title = element_text(face = "italic"))
 }
 
 # Creating ggplot function for average tissue health plot.
-gg_tissue_health <- function(x) {
+gg_tissue_health <- function(x,...) {
   ggplot(x, aes(x = factor(geno), y = weighted_health)) +
   geom_boxplot() +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
@@ -328,11 +332,12 @@ table_format <- function(x) {
 x$mortality_rate <- paste0(round(x$mortality_rate, 2), "%")
 x$avg_health <- paste0(round(x$avg_health, 2), "%")
 x %>% rename("Species" = species, 
-                       "Geno" = geno, 
+                      # "Geno" = geno, 
                        "# Outplanted" = num_outplanted, 
                        "# Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
+  nice_table() %>%
   colformat_num(digits = 1)
 }
 
@@ -360,6 +365,8 @@ Yellowman A: 3-month, 6-month
 Yellowman B: 3-month, 6-month
 Yellowman C: 3-month
 
+### Acer Overview
+
 ```{r combining acer sites}
 # Aligning class types
 puntv3$cluster <- str_remove_all(puntv3$cluster, "C") %>% as.numeric()
@@ -370,7 +377,7 @@ yellowmanA6$cluster <- str_remove_all(yellowmanA6$cluster, "C") %>% as.numeric()
 yellowmanB3$date <- as.POSIXct(yellowmanB3$date)
 yellowmanB3$cluster <- str_remove_all(yellowmanB3$cluster, "C") %>% as.numeric()
 
-# Binding Acer rows
+# Binding Acer rows.
 acer_all <- bind_rows(midushi13, puntv3, puntv6, yellowmanA3, yellowmanA6,
                       yellowmanB3, yellowmanB6, yellowmanC3) 
 
@@ -379,16 +386,114 @@ acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 ```
 
+```{r plotting distribution of acer_all data}
 
-```{r plotting acer_all data}
 acer_all %>%
-  group_by(site) %>%
-  filter(duration == max(duration)) %>%
-tissue_health() %>%
-  agg_table() %>%
-  gg_mortality()
+  group_by(species, site, duration) %>%
+  ggplot(aes(x=site, fill = factor(duration))) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Paired", direction = -1) +
+  labs(x = "Site",
+       y = "Count",
+       fill = "Survey Month",
+       title="Distribution of Acer Data") + 
+    theme(plot.title = element_text(face = "italic"))
 ```
 
+
+
+```{r plotting acer_all data}
+acer_latest <- acer_all %>%
+  group_by(species, site) %>%
+  filter(duration == max(duration))
+
+acer_latest %>%
+  tissue_health() %>%
+  agg_table() %>%
+  gg_mortality() +
+  scale_fill_viridis(discrete = FALSE, option = "turbo") +
+  theme(legend.position = "right") +
+  labs(fill = "Mortality Rate",
+       title = "Acer Mortality Rate",
+        caption = "As of latest site survey.")
+
+acer_latest %>%
+  tissue_health() %>%
+  group_by(geno) %>%
+  mutate(med_tissue = median(weighted_health)) %>%
+  ggplot(aes(x = factor(geno), y = weighted_health, fill = med_tissue)) +
+  geom_boxplot() +
+  scale_fill_viridis(discrete = FALSE, option = "mako") +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Genotype", 
+       y = "Percent of Healthy Tissue",
+       fill = "Median Health",
+       title = "Acer Average Tissue Health",
+       caption = "As of latest site survey.") + 
+    theme(plot.title = element_text(face = "italic"))
+
+```
+
+```{r acer mortality by site}
+acer_latest %>%
+  tissue_health() %>%
+  group_by(species, site) %>%
+   summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+              avg_health = mean(weighted_health)) %>%
+  arrange(desc(mortality_rate)) %>%
+  rename("Site" = site) %>%
+  table_format()
+  
+```
+
+
+```{r acer mortality by geno and site}
+
+acer_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) %>%
+  ggplot(aes(x=factor(geno), y=mortality_rate, fill=site)) +
+    geom_col(position = "dodge") +
+    facet_grid(~geno, scales = "free") +
+    #scale_fill_brewer(palette = "GnBu") +
+    #scale_fill_viridis(discrete = TRUE, option = "mako") +
+    scale_y_continuous(labels=scales::percent_format(scale=1)) +
+    labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="",
+       title="Genomic Mortality Rate by Site",
+       caption="As of latest site survey.") + 
+    theme(plot.title = element_text(face = "italic"),
+          legend.position="bottom")
+    
+```
+
+
+
+```{r acer 3- to 6-month changes}
+comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
+
+acer_all %>%
+  filter(site %in% comparison_sites) %>% 
+  tissue_health() %>%
+  group_by(species, duration, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  ggplot(aes(x = factor(geno), y = mortality_rate)) +
+    geom_point(aes(color = factor(duration))) +
+    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open")) +
+    scale_y_continuous(limits = c(0, 100), 
+                     breaks = seq(0, 100, by = 5)) 
+```
 
 
 
