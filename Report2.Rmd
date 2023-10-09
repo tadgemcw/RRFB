@@ -25,6 +25,7 @@ library(RColorBrewer)
 #display.brewer.all(colorblindFriendly = TRUE)
 library(viridisLite)
 library(viridis)
+library(plotly)
 ```
 
 ```{r, loading data}
@@ -397,7 +398,7 @@ acer_all %>%
        y = "Count",
        fill = "Survey Month",
        title="Distribution of Acer Data") + 
-    theme(plot.title = element_text(face = "italic"))
+    theme(plot.title = element_text(face = "italic")) 
 ```
 
 
@@ -429,8 +430,8 @@ acer_latest %>%
        y = "Percent of Healthy Tissue",
        fill = "Median Health",
        title = "Acer Average Tissue Health",
-       caption = "As of latest site survey.") + 
-    theme(plot.title = element_text(face = "italic"))
+       caption = "As of latest site survey.") +
+    theme(plot.title = element_text(face = "italic")) 
 
 ```
 
@@ -462,8 +463,8 @@ acer_latest %>%
   ggplot(aes(x=factor(geno), y=mortality_rate, fill=site)) +
     geom_col(position = "dodge") +
     facet_grid(~geno, scales = "free") +
-    #scale_fill_brewer(palette = "GnBu") +
-    #scale_fill_viridis(discrete = TRUE, option = "mako") +
+    scale_fill_brewer(palette = "GnBu") +
+    scale_fill_viridis(discrete = TRUE, option = "mako") +
     scale_y_continuous(labels=scales::percent_format(scale=1)) +
     labs(x="Acer Genotype", 
        y="Mortality Rate",
@@ -480,6 +481,34 @@ acer_latest %>%
 ```{r acer 3- to 6-month mortality}
 comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
 
+acer_comp1 <- acer_all %>%
+  filter(site %in% comparison_sites) %>% 
+  tissue_health() %>%
+  group_by(species, duration, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  filter(duration == 3)
+
+acer_comp2 <- acer_all %>%
+  filter(site %in% comparison_sites) %>% 
+  tissue_health() %>%
+  group_by(species, duration, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) 
+
+acer_comp1 %>%
+  plot_ly(x = ~factor(geno), y = ~round(mortality_rate,2)) %>%
+  add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
+  add_bars(data = acer_comp2, color = ~factor(geno), frame = ~duration) %>%
+  layout(xaxis = list(title = "Acer Genotype"),
+         yaxis = list(title = "Mortality Rate"),
+         title = "<br>What is the change in mortality rate over time?") %>%
+  hide_legend()
+  
 acer_all %>%
   filter(site %in% comparison_sites) %>% 
   tissue_health() %>%
@@ -490,15 +519,24 @@ acer_all %>%
             avg_health = mean(weighted_health)) %>%
   ggplot(aes(x = factor(geno), y = mortality_rate)) +
     geom_point(aes(color = factor(duration))) +
-    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open"))
+    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open")) +
+    scale_color_discrete(labels = c("3-Month", "6-Month")) +
+    labs(x = "Acer Genotype",
+         y = "Mortality Rate",
+         color = "Survey",
+         title = "What is the change in mortality rate over time?",
+        caption = "Data from Punt Vierkant, Yellowman A, and Yellowman B")
 ```
 ```{r acer comparison 3- to 6-month}
 
 acer_all %>%
   tissue_health() %>%
+  plot_ly(x=~factor(geno), y=~weighted_health, color = ~site)
+  
+acer_all %>%
+  tissue_health() %>%
   ggplot(aes(x = factor(geno), y = weighted_health, color = site)) + 
     geom_point() +
-    #scale_color_discrete(labels = c("Yellowman A", "Yellowman C")) +
     labs(x = "Acer Genotype", 
          y = "Percent of Healthy Tissue",
         color = "Site",
