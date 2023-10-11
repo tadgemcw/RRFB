@@ -12,7 +12,7 @@ output:
 
 ```{r global settings, setup, include=FALSE}
 library(knitr) #global settings
-opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center')
 ```
 
 ```{r, load libraries, include=FALSE}
@@ -334,8 +334,8 @@ x$mortality_rate <- paste0(round(x$mortality_rate, 2), "%")
 x$avg_health <- paste0(round(x$avg_health, 2), "%")
 x %>% rename("Species" = species, 
                       # "Geno" = geno, 
-                       "# Outplanted" = num_outplanted, 
-                       "# Survived" = num_survived, 
+                       "Outplanted" = num_outplanted, 
+                       "Survived" = num_survived, 
                        "Mortality Rate" = mortality_rate,
                        "Avg. Health" = avg_health) %>% 
   nice_table() %>%
@@ -353,7 +353,7 @@ x %>% rename("Species" = species,
 
 This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided after detailed surveys of the outplanted sites.  
 Mortality rates are a standard calculation of (corals present - dead corals) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
-All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *flextable*, and *rempsyc*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
+All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *flextable*, *rempsyc*, and *plotly*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
@@ -367,6 +367,8 @@ Yellowman B: 3-month, 6-month
 Yellowman C: 3-month
 
 ### Acer Overview
+
+The Acer data consists of survey from five sites: Mi Dushi, Punt Vierkant, Yellowman A, B, and C.  The Mi Dushi survey was taken 13 months after outplanting.  Data was provided from three- and six-month surveys for Punt VierKant, Yellowman A, and B.  All data utilized from Yellowman C is from a three-month survey.
 
 ```{r combining acer sites}
 # Aligning class types
@@ -401,24 +403,52 @@ acer_all %>%
     theme(plot.title = element_text(face = "italic")) 
 ```
 
+The table below lists the summary statistics for each Acer site.
 
+```{r acer mortality by site}
 
-```{r plotting acer_all data}
 acer_latest <- acer_all %>%
   group_by(species, site) %>%
   filter(duration == max(duration))
 
 acer_latest %>%
   tissue_health() %>%
+  group_by(species, site) %>%
+   summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+              avg_health = mean(weighted_health)) %>%
+  arrange(desc(mortality_rate)) %>%
+  rename("Site" = site) %>%
+  table_format()
+  
+```
+
+The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-months surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of the most current findings.
+
+```{r plotting acer_all data}
+
+acer_mortality.plot <- acer_latest %>%
+  tissue_health() %>%
   agg_table() %>%
-  gg_mortality() +
+  ggplot(aes(x = factor(geno), y = mortality_rate, fill = mortality_rate)) +
+  geom_col(aes(text= paste0("Mortality Rate: ", round(mortality_rate,2), "%"))) +
+  scale_y_continuous(labels=scales::percent_format(scale=1)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype") + 
+  theme(legend.position = "none") +
+    theme(plot.title = element_text(face = "italic")) +
   scale_fill_viridis(discrete = FALSE, option = "turbo") +
   theme(legend.position = "right") +
   labs(fill = "Mortality Rate",
        title = "Acer Mortality Rate",
         caption = "As of latest site survey.")
 
-acer_latest %>%
+ggplotly(acer_mortality.plot, tooltip = "text")
+
+
+acer_health.plot <- acer_latest %>%
   tissue_health() %>%
   group_by(geno) %>%
   mutate(med_tissue = median(weighted_health)) %>%
@@ -433,26 +463,14 @@ acer_latest %>%
        caption = "As of latest site survey.") +
     theme(plot.title = element_text(face = "italic")) 
 
+ggplotly(acer_health.plot) 
 ```
 
-```{r acer mortality by site}
-acer_latest %>%
-  tissue_health() %>%
-  group_by(species, site) %>%
-   summarize(num_outplanted = sum(n_outplanted),
-              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-              avg_health = mean(weighted_health)) %>%
-  arrange(desc(mortality_rate)) %>%
-  rename("Site" = site) %>%
-  table_format()
-  
-```
 
 
 ```{r acer mortality by geno and site}
 
-acer_latest %>%
+p1 <- acer_latest %>%
   tissue_health() %>%
   group_by(species, site, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
@@ -461,18 +479,21 @@ acer_latest %>%
             avg_health = mean(weighted_health)) %>%
   arrange(mortality_rate) %>%
   ggplot(aes(x=factor(geno), y=mortality_rate, fill=site)) +
-    geom_col(position = "dodge") +
-    facet_grid(~geno, scales = "free") +
-    scale_fill_brewer(palette = "GnBu") +
-    scale_fill_viridis(discrete = TRUE, option = "mako") +
-    scale_y_continuous(labels=scales::percent_format(scale=1)) +
-    labs(x="Acer Genotype", 
-       y="Mortality Rate",
-       fill="",
-       title="Genomic Mortality Rate by Site",
-       caption="As of latest site survey.") + 
-    theme(plot.title = element_text(face = "italic"),
-          legend.position="bottom")
+    geom_col(position = "dodge")
+  
+ggplotly(p1)
+
+ #   facet_grid(~geno, scales = "free") +
+  #  scale_fill_brewer(palette = "GnBu") +
+   # scale_fill_viridis(discrete = TRUE, option = "mako") +
+#    scale_y_continuous(labels=scales::percent_format(scale=1)) +
+ #   labs(x="Acer Genotype", 
+#       y="Mortality Rate",
+ #      fill="",
+#       title="Genomic Mortality Rate by Site",
+#       caption="As of latest site survey.") + 
+#    theme(plot.title = element_text(face = "italic"),
+#          legend.position="bottom") 
     
 ```
 
@@ -488,60 +509,35 @@ acer_comp1 <- acer_all %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
             mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health)) %>%
-  filter(duration == 3)
+            avg_health = mean(weighted_health))
 
-acer_comp2 <- acer_all %>%
-  filter(site %in% comparison_sites) %>% 
-  tissue_health() %>%
-  group_by(species, duration, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health)) 
+acer_comp2 <- acer_comp1 %>% filter(duration == 3)
 
-acer_comp1 %>%
-  plot_ly(x = ~factor(geno), y = ~round(mortality_rate,2)) %>%
+acer_comp2 %>%
+  plot_ly(x = ~factor(geno), 
+          y = ~mortality_rate, 
+          hoverinfo = "text", 
+          text = ~paste(round(mortality_rate,2), "%")) %>%
   add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
-  add_bars(data = acer_comp2, color = ~factor(geno), frame = ~duration) %>%
+  add_bars(data = acer_comp1, color = ~factor(geno), frame = ~duration) %>%
   layout(xaxis = list(title = "Acer Genotype"),
          yaxis = list(title = "Mortality Rate"),
-         title = "<br>What is the change in mortality rate over time?") %>%
+         title = "<br>How does mortality rate change over 3 months?") %>%
+  animation_slider(currentvalue = list(prefix = "Survey Month: ")) %>%
   hide_legend()
   
-acer_all %>%
-  filter(site %in% comparison_sites) %>% 
-  tissue_health() %>%
-  group_by(species, duration, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health)) %>%
-  ggplot(aes(x = factor(geno), y = mortality_rate)) +
-    geom_point(aes(color = factor(duration))) +
-    geom_line(arrow = arrow(length=unit(0.25,"cm"), ends="last", type = "open")) +
-    scale_color_discrete(labels = c("3-Month", "6-Month")) +
-    labs(x = "Acer Genotype",
-         y = "Mortality Rate",
-         color = "Survey",
-         title = "What is the change in mortality rate over time?",
-        caption = "Data from Punt Vierkant, Yellowman A, and Yellowman B")
 ```
 ```{r acer comparison 3- to 6-month}
 
-acer_all %>%
-  tissue_health() %>%
-  plot_ly(x=~factor(geno), y=~weighted_health, color = ~site)
-  
-acer_all %>%
+plot <- acer_all %>%
   tissue_health() %>%
   ggplot(aes(x = factor(geno), y = weighted_health, color = site)) + 
-    geom_point() +
-    labs(x = "Acer Genotype", 
-         y = "Percent of Healthy Tissue",
-        color = "Site",
-        title = "") +
-    theme(plot.title = element_text(face = "italic"))
+    geom_point()
+
+ggplotly(plot) %>%
+    layout(xaxis = list(title = "Acer Genotype<br>"),
+         yaxis = list(title = "Percent of Healthy Tissue"),
+         legend = list(x=1, y=.5, title = list(text = "Site")))
 ```
 
 
