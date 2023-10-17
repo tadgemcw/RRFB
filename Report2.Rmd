@@ -370,6 +370,8 @@ Yellowman C: 3-month
 
 The Acer data consists of survey from five sites: Mi Dushi, Punt Vierkant, Yellowman A, B, and C.  The Mi Dushi survey was taken 13 months after outplanting.  Data was provided from three- and six-month surveys for Punt VierKant, Yellowman A, and B.  All data utilized from Yellowman C is from a three-month survey.
 
+<br>
+
 ```{r combining acer sites}
 # Aligning class types
 puntv3$cluster <- str_remove_all(puntv3$cluster, "C") %>% as.numeric()
@@ -389,6 +391,7 @@ acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 ```
 
+
 ```{r plotting distribution of acer_all data}
 
 acer_all %>%
@@ -399,11 +402,15 @@ acer_all %>%
   labs(x = "Site",
        y = "Count",
        fill = "Survey Month",
-       title="Distribution of Acer Data") + 
-    theme(plot.title = element_text(face = "italic")) 
+       title="Distribution of Acer Data") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
+<br>
+
 The table below lists the summary statistics for each Acer site.
+
+<br>
 
 ```{r acer mortality by site}
 
@@ -424,10 +431,17 @@ acer_latest %>%
   
 ```
 
-The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-months surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of the most current findings.
+<br>
+
+The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
+
+Genos #3, #9, #14, and #22 have the highest mortality rates.  This corresponds with the average tissue health, indicating these are perhaps the least successful genos.  Conversely, genos #7-8, #12, #24, and #26 have performed better than the rest.  
+
+<br>
 
 ```{r plotting acer_all data}
 
+# Mortality plot.
 acer_mortality.plot <- acer_latest %>%
   tissue_health() %>%
   agg_table() %>%
@@ -438,16 +452,16 @@ acer_mortality.plot <- acer_latest %>%
        y="Mortality Rate",
        fill="Genotype") + 
   theme(legend.position = "none") +
-    theme(plot.title = element_text(face = "italic")) +
   scale_fill_viridis(discrete = FALSE, option = "turbo") +
   theme(legend.position = "right") +
   labs(fill = "Mortality Rate",
        title = "Acer Mortality Rate",
-        caption = "As of latest site survey.")
+        caption = "As of latest site survey.") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(acer_mortality.plot, tooltip = "text")
 
-
+# Tissue Health plot.
 acer_health.plot <- acer_latest %>%
   tissue_health() %>%
   group_by(geno) %>%
@@ -460,17 +474,17 @@ acer_health.plot <- acer_latest %>%
        y = "Percent of Healthy Tissue",
        fill = "Median Health",
        title = "Acer Average Tissue Health",
-       caption = "As of latest site survey.") +
-    theme(plot.title = element_text(face = "italic")) 
+       caption = "As of latest site survey.") + 
+  theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(acer_health.plot) 
 ```
 
+<br>
 
+```{r attempting heat map of mortality and tissue health}
 
-```{r acer mortality by geno and site}
-
-p1 <- acer_latest %>%
+acer_latest %>%
   tissue_health() %>%
   group_by(species, site, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
@@ -478,26 +492,47 @@ p1 <- acer_latest %>%
             mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
             avg_health = mean(weighted_health)) %>%
   arrange(mortality_rate) %>%
-  ggplot(aes(x=factor(geno), y=mortality_rate, fill=site)) +
-    geom_col(position = "dodge")
-  
-ggplotly(p1)
+  ggplot(aes(x = mortality_rate, y = avg_health)) +
+    geom_point(aes(shape = site, color = site)) +
+    geom_smooth(se = FALSE, method = "lm", color = "cornflowerblue") +
+    labs(x = "Mortality Rate",
+         y = "Average Tissue Health",
+         color = "Site",
+         shape = "Site",
+         title = "Correlation Between Tissue Health & Mortality Rate")
 
- #   facet_grid(~geno, scales = "free") +
-  #  scale_fill_brewer(palette = "GnBu") +
-   # scale_fill_viridis(discrete = TRUE, option = "mako") +
-#    scale_y_continuous(labels=scales::percent_format(scale=1)) +
- #   labs(x="Acer Genotype", 
-#       y="Mortality Rate",
- #      fill="",
-#       title="Genomic Mortality Rate by Site",
-#       caption="As of latest site survey.") + 
-#    theme(plot.title = element_text(face = "italic"),
-#          legend.position="bottom") 
-    
 ```
 
 
+<br>
+
+```{r acer mortality by geno and site}
+
+acer_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) %>%
+  plot_ly(x = ~factor(geno), 
+          y = ~mortality_rate, 
+          color = ~site, 
+          hoverinfo = "text", 
+          text = ~paste0("Site: ", site, "<br>",
+                         "Geno: ",geno, "<br>", 
+                         "Mortality Rate: ", round(mortality_rate, 2), "%")) %>%
+    add_bars(width = 0.5, position = "jitter") %>%
+    layout(xaxis = list(title = "Acer Genotype"),
+           yaxis = list(title = "Mortality Rate"),
+           title = "Acer Mortality Rate by Site",
+           legend = list(x=1, y=.5, title = list(text = "Site")),
+            plot_bgcolor = "whitesmoke")
+
+```
+
+<br>
 
 ```{r acer 3- to 6-month mortality}
 comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
@@ -517,30 +552,40 @@ acer_comp2 %>%
   plot_ly(x = ~factor(geno), 
           y = ~mortality_rate, 
           hoverinfo = "text", 
-          text = ~paste(round(mortality_rate,2), "%")) %>%
+          text = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
   add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
   add_bars(data = acer_comp1, color = ~factor(geno), frame = ~duration) %>%
   layout(xaxis = list(title = "Acer Genotype"),
          yaxis = list(title = "Mortality Rate"),
-         title = "<br>How does mortality rate change over 3 months?") %>%
+         title = "How Does Mortality Rate Change Over 3 Months?",
+          plot_bgcolor = "whitesmoke") %>%
   animation_slider(currentvalue = list(prefix = "Survey Month: ")) %>%
   hide_legend()
   
 ```
+
+<br>
+
 ```{r acer comparison 3- to 6-month}
 
-plot <- acer_all %>%
+acer_all %>%
   tissue_health() %>%
-  ggplot(aes(x = factor(geno), y = weighted_health, color = site)) + 
-    geom_point()
-
-ggplotly(plot) %>%
-    layout(xaxis = list(title = "Acer Genotype<br>"),
+  plot_ly(x = ~factor(geno),
+          y = ~weighted_health,
+          color = ~site,
+          hoverinfo = "text",
+          text = ~paste0("Site: ", site, "<br>",
+                         "Geno: ", geno,  "<br>",
+                         "Tissue Health: ", round(weighted_health, 2), "%")) %>%
+  add_markers() %>%
+  layout(xaxis = list(title = "Acer Genotype<br>"),
          yaxis = list(title = "Percent of Healthy Tissue"),
-         legend = list(x=1, y=.5, title = list(text = "Site")))
+         title = "Acer Tissue Health by Site",
+         legend = list(x=1, y=.5, title = list(text = "Site")),
+         plot_bgcolor = "whitesmoke")
 ```
 
-
+<br>
 
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
