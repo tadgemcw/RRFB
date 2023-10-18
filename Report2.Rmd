@@ -461,76 +461,11 @@ acer_mortality.plot <- acer_latest %>%
 
 ggplotly(acer_mortality.plot, tooltip = "text")
 
-# Tissue Health plot.
-acer_health.plot <- acer_latest %>%
-  tissue_health() %>%
-  group_by(geno) %>%
-  mutate(med_tissue = median(weighted_health)) %>%
-  ggplot(aes(x = factor(geno), y = weighted_health, fill = med_tissue)) +
-  geom_boxplot() +
-  scale_fill_viridis(discrete = FALSE, option = "mako") +
-  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
-  labs(x = "Acer Genotype", 
-       y = "Percent of Healthy Tissue",
-       fill = "Median Health",
-       title = "Acer Average Tissue Health",
-       caption = "As of latest site survey.") + 
-  theme(plot.title = element_text(hjust = 0.5))
-
-ggplotly(acer_health.plot) 
 ```
 
 <br>
 
-```{r attempting heat map of mortality and tissue health}
-
-acer_latest %>%
-  tissue_health() %>%
-  group_by(species, site, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health)) %>%
-  arrange(mortality_rate) %>%
-  ggplot(aes(x = mortality_rate, y = avg_health)) +
-    geom_point(aes(shape = site, color = site)) +
-    geom_smooth(se = FALSE, method = "lm", color = "cornflowerblue") +
-    labs(x = "Mortality Rate",
-         y = "Average Tissue Health",
-         color = "Site",
-         shape = "Site",
-         title = "Correlation Between Tissue Health & Mortality Rate")
-
-```
-
-
-<br>
-
-```{r acer mortality by geno and site}
-
-acer_latest %>%
-  tissue_health() %>%
-  group_by(species, site, geno) %>%
-  summarize(num_outplanted = sum(n_outplanted),
-            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health)) %>%
-  arrange(mortality_rate) %>%
-  plot_ly(x = ~factor(geno), 
-          y = ~mortality_rate, 
-          color = ~site, 
-          hoverinfo = "text", 
-          text = ~paste0("Site: ", site, "<br>",
-                         "Geno: ",geno, "<br>", 
-                         "Mortality Rate: ", round(mortality_rate, 2), "%")) %>%
-    add_bars(width = 0.5, position = "jitter") %>%
-    layout(xaxis = list(title = "Acer Genotype"),
-           yaxis = list(title = "Mortality Rate"),
-           title = "Acer Mortality Rate by Site",
-           legend = list(x=1, y=.5, title = list(text = "Site")),
-            plot_bgcolor = "whitesmoke")
-
-```
+Below, I isolated the data to site with both three- and six-month surveys (Punt Vierkant, Yellowman A, and Yellowman B) and plotted the change in mortality rate over time.  The data indicates that while a three-month survey may be reasonable for obtaining a baseline of outplanting success for some genos, others (#9, #14, #22, and #25 for example) may take longer to fully establish.
 
 <br>
 
@@ -566,7 +501,64 @@ acer_comp2 %>%
 
 <br>
 
-```{r acer comparison 3- to 6-month}
+Separating the mortality rate findings by site reveals which site have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
+
+<br>
+
+```{r acer mortality by geno and site}
+
+acer_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) %>%
+  plot_ly(x = ~factor(geno), 
+          y = ~mortality_rate, 
+          color = ~site, 
+          hoverinfo = "text", 
+          text = ~paste0("Site: ", site, "<br>",
+                         "Geno: ",geno, "<br>", 
+                         "Mortality Rate: ", round(mortality_rate, 2), "%")) %>%
+    add_bars(width = 0.5, position = "jitter") %>%
+    layout(xaxis = list(title = "Acer Genotype"),
+           yaxis = list(title = "Mortality Rate"),
+           title = "Acer Mortality Rate by Site",
+           legend = list(x=1, y=.5, title = list(text = "Site")),
+            plot_bgcolor = "whitesmoke")
+
+```
+<br>
+The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
+<br>
+
+```{r acer tissue health by geno}
+
+acer_health.plot <- acer_latest %>%
+  tissue_health() %>%
+  group_by(geno) %>%
+  mutate(med_tissue = median(weighted_health)) %>%
+  ggplot(aes(x = factor(geno), y = weighted_health, fill = med_tissue)) +
+  geom_boxplot() +
+  scale_fill_viridis(discrete = FALSE, option = "mako") +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
+  labs(x = "Acer Genotype", 
+       y = "Percent of Healthy Tissue",
+       fill = "Median Health",
+       title = "Acer Average Tissue Health",
+       caption = "As of latest site survey.") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplotly(acer_health.plot) 
+```
+
+<br>
+The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+<br>
+
+```{r acer tissue health by site}
 
 acer_all %>%
   tissue_health() %>%
@@ -583,9 +575,42 @@ acer_all %>%
          title = "Acer Tissue Health by Site",
          legend = list(x=1, y=.5, title = list(text = "Site")),
          plot_bgcolor = "whitesmoke")
+
 ```
 
 <br>
+Coorelations between mortality rate and tissue health exists.  Linear regression is used below to plot the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
+<br>
+
+```{r acer mortality vs tissue health}
+
+acer4model <- acer_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno, duration) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) 
+
+print(paste0("The correlation between mortality rate and tissue health is ", round(cor(acer4model$mortality_rate, acer4model$avg_health),3), "."))
+             
+acermod <- lm(mortality_rate ~ avg_health, data = acer4model)
+acermod
+anova(acermod)
+
+ggplot(acer4model, aes(x = mortality_rate, y = avg_health)) +
+  geom_point(aes(shape = site, color = site)) +
+  geom_smooth(se = FALSE, method = lm, color = "cornflowerblue") +
+  labs(x = "Mortality Rate",
+         y = "Average Tissue Health",
+         color = "Site",
+         shape = "Site",
+         title = "Acer Tissue Health vs. Mortality Rate") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
 
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
