@@ -610,7 +610,25 @@ ggplot(acer4model, aes(x = mortality_rate, y = avg_health)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
+<br>
+### Portfolio Analysis
+<br>
 
+```{r acer portfolio analysis}
+acer_all <- acer_all %>%
+  tissue_health() %>%
+  mutate(mortality_rate = (1-(n_present - health_0) / n_outplanted) * 100)
+acer_all$mortality_rate <- replace_na(acer_all$mortality_rate, 0)
+
+plot_ly(acer_all, x = ~mortality_rate) %>%
+  add_histogram()
+
+str(acer_all$mortality_rate)
+  
+
+```
+
+<br>
 
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
