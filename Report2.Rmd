@@ -2,7 +2,7 @@
 title: "Analysis of Coral Restoration Efforts"
 subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
-date: "Updated 2023-09-30"
+date: "Updated 2023-10-23"
 output: 
   html_document:
     toc: TRUE
@@ -26,6 +26,7 @@ library(RColorBrewer)
 library(viridisLite)
 library(viridis)
 library(plotly)
+library(trelliscopejs)
 ```
 
 ```{r, loading data}
@@ -384,7 +385,8 @@ yellowmanB3$cluster <- str_remove_all(yellowmanB3$cluster, "C") %>% as.numeric()
 
 # Binding Acer rows.
 acer_all <- bind_rows(midushi13, puntv3, puntv6, yellowmanA3, yellowmanA6,
-                      yellowmanB3, yellowmanB6, yellowmanC3) 
+                      yellowmanB3, yellowmanB6, yellowmanC3) %>%
+            arrange(date)
 
 # Changing duration to numeric.
 acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
@@ -614,22 +616,108 @@ ggplot(acer4model, aes(x = mortality_rate, y = avg_health)) +
 ### Portfolio Analysis
 <br>
 
-```{r acer portfolio analysis}
-acer_all <- acer_all %>%
+```{r acer bootstrapping portfolio}
+# Creating tidy acer portfolio.
+acer.port <- acer_all %>%
   tissue_health() %>%
-  mutate(mortality_rate = (1-(n_present - health_0) / n_outplanted) * 100)
-acer_all$mortality_rate <- replace_na(acer_all$mortality_rate, 0)
+  mutate(mortality_rate = (n_outplanted-(n_present - health_0)) / n_outplanted,
+         returns = 1 - mortality_rate) %>% 
+  select(geno, weighted_health, mortality_rate, returns)
 
-plot_ly(acer_all, x = ~mortality_rate) %>%
-  add_histogram()
+acer.port$mortality_rate <- replace_na(acer.port$mortality_rate, 0)
+acer.port$returns <- replace_na(acer.port$returns, 1) 
 
-str(acer_all$mortality_rate)
-  
+# Reviewing distribution of data.
+acer.port %>% 
+  group_by(geno) %>% 
+  count() %>%
+  ggplot(aes(x = factor(geno), y = n)) +
+  geom_col()
+
+acer.port %>% 
+  count(geno, sort = TRUE) %>%
+  mutate(percent = 100 * n / sum(n))
+
+# Reviewing distribution of returns for each geno with trelliscope.
+# acer.port %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
+
+
+# Creating aggregate portfolio by geno.
+acer.port.agg <- acer.port %>%
+  group_by(geno) %>%
+  summarize(avg_health = mean(weighted_health),
+            avg_mortality = mean(mortality_rate),
+            avg_returns = mean(returns),
+            sd = sd(returns))
+
+
+# Creating bootstrap data set.
+acer.boot <- replicate(n = 1000, simplify = FALSE, expr = {
+  acer.port %>%
+  group_by(geno) %>%
+  slice_sample(prop = 1, replace = TRUE)
+ }) %>%
+  bind_rows()
+
+# Summarizing bootstrapped data by geno.
+acer.boot.agg <- acer.boot %>%
+  summarize(avg_health = mean(weighted_health),
+         avg_mortality = mean(mortality_rate),
+         avg_returns = mean(returns),
+         sd = sd(returns))
+
+
+summary(acer.port.agg[,2:5])
+summary(acer.boot.agg[,2:5])
+
+# Checking for normal distribution.
+#acer.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
 
 ```
 
-<br>
 
+
+```{r acer portfolio analysis}
+
+library(PortfolioAnalytics)
+
+#Number of unique genos
+#length(unique(acer.port$geno))
+
+acer.returns.wide <- acer.boot %>%
+  select(geno, returns) %>%
+  group_by(geno) %>%
+  mutate(row = row_number()) %>%
+  pivot_wider(names_from = geno, values_from = returns) %>%
+  select(-row)
+
+acer.returns.wide <- as.ts(acer.returns.wide)
+port_spec <- portfolio.spec(assets = colnames(acer.returns.wide))
+port_spec <- add.constraint(portfolio = port_spec, type = "full_investment")
+port_spec <- add.constraint(portfolio = port_spec, type = "long_only")
+port_spec <- add.objective(portfolio = port_spec, type = "return", name = "mean")
+port_spec <- add.objective(portfolio = port_spec, type = "risk", name = "StdDev")
+port_spec <- add.constraint(portfolio = port_spec, type = "box",
+                                  min = 0.01, max = 0.4, 
+                                  indexnum = 2)
+
+opt <- optimize.portfolio(acer.returns.wide,
+                          portfolio = port_spec,
+                          optimize_method = "random",
+                          trace = TRUE)
+
+# Visualizing results.
+opt
+chart.Weights(opt)
+chart.RiskReward(opt, risk.col = "StdDev", return.col = "mean", chart.assets = FALSE,
+                 main = "Optimal Portfolio")
+
+```
+
+
+
+
+<br>
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
 Knife I A: 1-month, 5-month, 6-month
