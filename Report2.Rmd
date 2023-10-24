@@ -1,6 +1,6 @@
 ---
-title: "Analysis of Coral Restoration Efforts"
-subtitle: "A Collaboration with Reef Renewal Bonaire"
+title: "Improving Reef Resilience and Diversity with Portfolio Analysis"
+subtitle: "Analysis of Coral Restoration Efforts with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
 date: "Updated 2023-10-23"
 output: 
