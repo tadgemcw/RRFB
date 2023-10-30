@@ -505,6 +505,8 @@ acer_comp2 %>%
 <br>
 
 Separating the mortality rate findings by site reveals which site have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
+<br>
+*Note: clicking on the legend names allows you to filter the chart.*
 
 <br>
 
@@ -533,8 +535,11 @@ acer_latest %>%
             plot_bgcolor = "whitesmoke")
 
 ```
+
 <br>
+
 The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
+
 <br>
 
 ```{r acer tissue health by geno}
@@ -542,23 +547,24 @@ The average tissue health for each geno is generally in line with the mortality 
 acer_health.plot <- acer_latest %>%
   tissue_health() %>%
   group_by(geno) %>%
-  mutate(med_tissue = median(weighted_health)) %>%
-  ggplot(aes(x = factor(geno), y = weighted_health, fill = med_tissue)) +
-  geom_boxplot() +
-  scale_fill_viridis(discrete = FALSE, option = "mako") +
-  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
-  labs(x = "Acer Genotype", 
-       y = "Percent of Healthy Tissue",
-       fill = "Median Health",
-       title = "Acer Average Tissue Health",
-       caption = "As of latest site survey.") + 
-  theme(plot.title = element_text(hjust = 0.5))
+  mutate(med_tissue = median(weighted_health))
 
-ggplotly(acer_health.plot) 
+plot_ly(acer_health.plot, 
+        x = ~factor(geno),
+        y = ~weighted_health,
+        color = ~factor(geno)) %>%
+  add_boxplot() %>%
+  layout(xaxis = list(title = "Acer Genotype"),
+         yaxis = list(title = "Acer Average Tissue Health"),
+         title = "Acer Average Tissue Health") %>%
+  hide_legend()
+
 ```
 
 <br>
+
 The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+
 <br>
 
 ```{r acer tissue health by site}
@@ -582,7 +588,9 @@ acer_all %>%
 ```
 
 <br>
-Coorelations between mortality rate and tissue health exists.  Linear regression is used below to plot the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
+
+A negative correlation between mortality rate and tissue health exists.  The linear regression line below highlights the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
+
 <br>
 
 ```{r acer mortality vs tissue health}
@@ -614,7 +622,16 @@ ggplot(acer4model, aes(x = mortality_rate, y = avg_health)) +
 
 ```
 <br>
-###Portfolio Analysis
+
+### Acer Portfolio Analysis
+<br>
+
+The goals are Reef Renewal Bonaire are to successfully outplant as many corals as possible but also to ensure new reefs are genomicaly diverse.  Thus, the driving question is how to achieve both goals with maximial efficiency of time and resources.  One strategy could be to plant an equal number of each genotype; however, the data shows that not all genotypes are equally resilient.  As a result, I propose building a weighted portfolio of genotypes in the same manor as one might build a financial portfolio of investments.
+
+In typical portfolio analysis, the primary factors of consideration are the return on investment for each account and the standard distribution of returns (risk).  From these factors, an optimal basket of accounts is selected to achieve the desired portfolio goals.  In a portfolio of genotypes, I propose using the inverse mortality rate as the return on investment.  For example, geno #1 has an average mortality rate of 3.11%; therefore, a 96.89% survival rate (return on investment).  Similarly, geno #3 has a 21.54% average mortality rate and so there is a 78.46% average return.  The standard deviation of returns is then calculated for each genomic group of observations as a measure of risk.
+
+Having a sufficiently large sample size to calculate accurate returns and standard deviations is important.  Below, I have plotted the distribution of observations to visualize the raw sample size of each genotype.  
+
 <br>
 
 ```{r acer creating portfolio}
@@ -630,21 +647,17 @@ acer.port$returns <- replace_na(acer.port$returns, 1)
 
 # Reviewing distribution of data.
 acer.port %>% 
-  group_by(geno) %>% 
-  count() %>%
-  ggplot(aes(x = factor(geno), y = n)) +
-  geom_col()
+  count(geno) %>%
+  mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
+  plot_ly(x = ~factor(geno), y = ~n, color = ~factor(geno), hoverinfo = "text",
+          text = ~paste0("Observations: ", n, "<br>",
+                          "Percent of Total: ", percent, "%", "<br>")) %>%
+  add_bars() %>%
+  layout(xaxis = list(title = "Acer Genotypes"),
+        yaxis = list(title = "Observations"),
+        title = "Distribution of Observations") %>%
+  hide_legend()
 
-acer.dist.table <- acer.port %>% 
-  count(geno, sort = TRUE) %>%
-  mutate(percent = paste0(round(100 * n / sum(n),2),"%"))
-
-acer.dist.table %>% 
-  rename("Geno" = geno, 
-          "Observations" = n, 
-          "Percent" = percent) %>% 
-  nice_table() %>%
-  colformat_num(digits = 1)
 
 # Creating aggregate portfolio by geno.
 acer.port.agg <- acer.port %>%
@@ -652,19 +665,31 @@ acer.port.agg <- acer.port %>%
   summarize(avg_health = mean(weighted_health),
             avg_mortality = mean(mortality_rate),
             avg_returns = mean(returns),
-            sd = sd(returns))
+            sd = sd(returns),
+            observations = n())
 
+```
+
+<br>
+
+Additionally, the chart below shows the relationship between average return and standard deviation.
+
+<br>
+
+```{r acer portolio return vs sd }
 
 plot_ly(acer.port.agg, x = ~sd, 
                       y = ~avg_returns, 
                       color = ~factor(geno),
                       hoverinfo = "text", 
                       text = ~paste0("Geno: ", geno, "<br>",
+                                     "Observations: ", observations, "<br>",
                                     "Average Return: ", round(avg_returns,3), "<br>",
                                     "Standard Deviation: ", round(sd, 3))) %>%
+                    add_markers(size = ~observations) %>%
                     layout(xaxis = list(title = "Standard Deviation"),
                            yaxis = list(title = "Average Returns"),
-                           title = "How Risk and Return Relate") %>%
+                           title = "How Risk and Return Are Related") %>%
                     hide_legend()
 
 # Reviewing distribution of returns for each geno with trelliscope.
@@ -672,10 +697,15 @@ plot_ly(acer.port.agg, x = ~sd,
 
 ```
 
+<br>
 
+#### Bootstrapping
+
+Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data; and through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  With normally distributed samples, the average returns will closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis is more representative of the population.
+
+<br>
 
 ```{r acer bootstrapping portfolio}
-
 
 # Creating bootstrap data set.
 acer.boot <- replicate(n = 1000, simplify = FALSE, expr = {
@@ -690,20 +720,33 @@ acer.boot.agg <- acer.boot %>%
   summarize(avg_health = mean(weighted_health),
          avg_mortality = mean(mortality_rate),
          avg_returns = mean(returns),
-         sd = sd(returns))
-
-
-summary(acer.port.agg[,2:5])
-summary(acer.boot.agg[,2:5])
-
-
-# Checking for normal distribution.
-#acer.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
+         sd = sd(returns),
+         observations = n())
 
 ```
 
 
+**Summary of Raw Data**
+```{r acer portfolio raw table}
+# Raw data summary
+print(summary(acer.port.agg[,4:6]))
 
+```
+
+**Summary of Bootstrapped Data**
+```{r acer portfolio bootstrap table}
+
+# Boostrapped data summary
+summary(acer.boot.agg[,4:6])
+
+# Checking for normal distribution.
+#acer.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
+  
+```
+
+
+
+<br>
 
 ```{r acer portfolio analysis}
 
