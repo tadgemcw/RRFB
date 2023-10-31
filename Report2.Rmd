@@ -1,6 +1,6 @@
 ---
-title: "Improving Reef Resilience and Diversity with Portfolio Analysis"
-subtitle: "Analysis of Coral Restoration Efforts with Reef Renewal Bonaire"
+title: "Improving Reef Resilience with Portfolio Analysis"
+subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
 date: "Updated 2023-10-23"
 output: 
@@ -196,7 +196,7 @@ knifeB3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
 # Knife B 6-Month Survey
 knifeB6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
                           sheet = 6, 
-                          range = 'C2:Q115',
+                          range = 'C2:Q113',
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
@@ -206,17 +206,18 @@ knifeB6 <- read_excel("Knife I Apal Monitoring Database.xlsx",
 # Knife C 3-Month Survey
 knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
                     sheet = 7, 
-                    range = 'A2:Z86',
+                    range = 'A2:Z83',
                     col_names = c("date", "bond", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
                                   "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
                                   "disease", "ciliate", "bottom_contact", "fireworm",
                                   "snail", "competition", "sedimentation", "unknown", "n_stressors"))%>%
-            mutate(site = "Knife C")
+            mutate(site = "Knife C",
+                   duration = "3M")
 
 # Knife C 6-Month Survey
-knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
+knifeC6 <- read_excel("Knife I Apal Monitoring Database.xlsx", 
                     sheet = 8, 
                     range = 'A2:Z86',
                     col_names = c("date", "bond", "species", "geno", "cluster", 
@@ -225,7 +226,8 @@ knifeC3 <- read_excel("Knife I Apal Monitoring Database.xlsx",
                                   "rm_rank", "perc_dead_tissue", "perc_rm_clust", 
                                   "disease", "ciliate", "bottom_contact", "fireworm",
                                   "snail", "competition", "sedimentation", "unknown", "n_stressors"))%>%
-            mutate(site = "Knife C")
+            mutate(site = "Knife C", 
+                   duration = "6M")
 
 # Oil Slick 1-Month Survey
 oilslick1 <- read_excel("Oil Slick Monitoring Database.xlsx", 
@@ -250,7 +252,7 @@ oilslick7 <- read_excel("Oil Slick Monitoring Database.xlsx",
 # Oil Slick 13-Month Survey
 oilslick13 <- read_excel("Oil Slick Monitoring Database.xlsx", 
                           sheet = 4, 
-                          range = 'C2:Q29',
+                          range = 'C2:Q26',
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
@@ -270,7 +272,7 @@ southbay0.5 <- read_excel("South Bay II Monitoring Database.xlsx",
 # South Bay II 18-Month Survey
 southbay18 <- read_excel("South Bay II Monitoring Database.xlsx", 
                           sheet = 3, 
-                          range = 'C2:Q71',
+                          range = 'C2:Q62',
                           col_names = c("date", "duration", "species", "geno", "cluster", 
                                   "n_outplanted","n_present", "n_lost", "health_0",
                                   "health_q1", "health_q2", "health_q3", "health_q4", "health_100",
@@ -384,7 +386,7 @@ yellowmanA6$cluster <- str_remove_all(yellowmanA6$cluster, "C") %>% as.numeric()
 yellowmanB3$date <- as.POSIXct(yellowmanB3$date)
 yellowmanB3$cluster <- str_remove_all(yellowmanB3$cluster, "C") %>% as.numeric()
 
-# Binding Acer rows.
+# Binding acer rows.
 acer_all <- bind_rows(midushi13, puntv3, puntv6, yellowmanA3, yellowmanA6,
                       yellowmanB3, yellowmanB6, yellowmanC3) %>%
             arrange(date)
@@ -405,7 +407,7 @@ acer_all %>%
   labs(x = "Site",
        y = "Count",
        fill = "Survey Month",
-       title="Distribution of Acer Data") +
+       title="Distribution of acer Data") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
@@ -564,6 +566,8 @@ plot_ly(acer_health.plot,
 <br>
 
 The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+<br>
+*Note: clicking on the legend names allows you to filter the chart.*
 
 <br>
 
@@ -701,7 +705,7 @@ plot_ly(acer.port.agg, x = ~sd,
 
 #### Bootstrapping
 
-Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data; and through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  With normally distributed samples, the average returns will closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis is more representative of the population.
+Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
 
 <br>
 
@@ -743,8 +747,11 @@ summary(acer.boot.agg[,4:6])
 #acer.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
   
 ```
+<br>
 
-
+Finally, the Portfolio Analytics' optimize.portfolio function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
+<br>
+The outputs below identify the optimal weights for each genotype and the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations the model considered.  
 
 <br>
 
@@ -770,21 +777,23 @@ port_spec <- add.constraint(portfolio = port_spec, type = "box",
                                   min = 0.01, max = 0.4, 
                                   indexnum = 2)
 
-opt <- optimize.portfolio(acer.returns.wide,
+set.seed(2)
+acer.opt <- optimize.portfolio(acer.returns.wide,
                           portfolio = port_spec,
                           optimize_method = "random",
+                          search_size = 20000,
                           trace = TRUE)
 
 # Visualizing results.
-opt
-chart.Weights(opt)
-chart.RiskReward(opt, risk.col = "StdDev", return.col = "mean", chart.assets = FALSE,
+acer.opt
+chart.Weights(acer.opt)
+chart.RiskReward(acer.opt, risk.col = "StdDev", return.col = "mean", chart.assets = FALSE,
                  main = "Optimal Acer Portfolio")
 
 ```
 
-
 <br>
+
 ## Species: Apal
 Carl’s Hill: 3-month, 6-month
 Knife I A: 1-month, 5-month, 6-month
@@ -792,6 +801,438 @@ Knife I B: 3-month, 6-month
 Knife I C: 3-month, 6-month
 Oil Slick: 1-month, 7-month, 13-month
 Southbay II: 0.5-month, 18-month
+
+### Apal Overview
+
+The Apal data consists of survey from four sites: Carl's Hill, Knife I (A-C), Oil Slick, and Southbay II.  
+
+<br>
+
+```{r combining apal sites}
+
+# Aligning class types
+carl3$cluster <- str_remove_all(carl3$cluster, "C") %>% as.numeric()
+knifeA3$cluster <- str_remove_all(knifeA3$cluster, "C") %>% as.numeric()
+knifeA5$cluster <- str_remove_all(knifeA5$cluster, "C") %>% as.numeric()
+knifeA6$cluster <- str_remove_all(knifeA6$cluster, "C") %>% as.numeric()
+knifeB3$cluster <- str_remove_all(knifeB3$cluster, "C") %>% as.numeric()
+knifeB6$cluster <- str_remove_all(knifeB6$cluster, "C") %>% as.numeric()
+knifeB6$geno <- as.numeric(knifeB6$geno)
+knifeC3$cluster <- as.numeric(knifeC3$cluster)
+knifeC3$n_outplanted <- as.numeric(knifeC3$n_outplanted)
+knifeC6$n_outplanted <- as.numeric(knifeC6$n_outplanted)
+southbay0.5$cluster <- str_remove_all(southbay0.5$cluster, "C") %>% as.numeric()
+southbay18$cluster <- str_remove_all(southbay18$cluster, "C") %>% as.numeric()
+
+# Binding apal rows.
+apal_all <- bind_rows(carl3, carl6, knifeA3, knifeA5, knifeA6, knifeB3, knifeB6, 
+                      knifeC3, knifeC6, oilslick1, oilslick7, oilslick13, southbay0.5, 
+                      southbay18) %>%
+            arrange(date)
+
+# Changing duration to numeric.
+apal_all$duration <- apal_all$duration %>% str_remove_all("M") %>% as.numeric()
+
+```
+
+
+```{r plotting distribution of apal_all data}
+
+apal_all %>%
+  group_by(species, site, duration) %>%
+  ggplot(aes(x=site, fill = factor(duration))) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Paired", direction = -1) +
+  labs(x = "Site",
+       y = "Count",
+       fill = "Survey Month",
+       title="Distribution of Apal Data") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+<br>
+
+The table below lists the summary statistics for each Apal site.
+
+<br>
+
+```{r apal mortality by site}
+
+apal_latest <- apal_all %>%
+  group_by(species, site) %>%
+  filter(duration == max(duration))
+
+apal_latest %>%
+  tissue_health() %>%
+  group_by(species, site) %>%
+   summarize(num_outplanted = sum(n_outplanted),
+              num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+              mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+              avg_health = mean(weighted_health)) %>%
+  arrange(desc(mortality_rate)) %>%
+  rename("Site" = site) %>%
+  table_format()
+
+```
+
+<br>
+#####################
+The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
+
+Genos #3, #9, #14, and #22 have the highest mortality rates.  This corresponds with the average tissue health, indicating these are perhaps the least successful genos.  Conversely, genos #7-8, #12, #24, and #26 have performed better than the rest.  
+#######################
+<br>
+
+```{r plotting apal_all data}
+
+# Mortality plot.
+apal_mortality.plot <- apal_latest %>%
+  tissue_health() %>%
+  agg_table() %>%
+  ggplot(aes(x = factor(geno), y = mortality_rate, fill = mortality_rate)) +
+  geom_col(aes(text= paste0("Mortality Rate: ", round(mortality_rate,2), "%"))) +
+  scale_y_continuous(labels=scales::percent_format(scale=1)) +
+  labs(x="Genotype", 
+       y="Mortality Rate",
+       fill="Genotype") + 
+  theme(legend.position = "none") +
+  scale_fill_viridis(discrete = FALSE, option = "turbo") +
+  theme(legend.position = "right") +
+  labs(fill = "Mortality Rate",
+       title = "Apal Mortality Rate",
+        caption = "As of latest site survey.") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplotly(apal_mortality.plot, tooltip = "text")
+
+```
+
+<br>
+#################
+Below, I isolated the data to site with both three- and six-month surveys (Punt Vierkant, Yellowman A, and Yellowman B) and plotted the change in mortality rate over time.  The data indicates that while a three-month survey may be reasonable for obtaining a baseline of outplanting success for some genos, others (#9, #14, #22, and #25 for example) may take longer to fully establish.
+##################
+<br>
+
+```{r apal 3- to 6-month mortality}
+apal_comparison_sites <- c("Carl's Hill", "Knife B", "Knife C")
+
+apal_comp1 <- apal_all %>%
+  filter(site %in% apal_comparison_sites) %>% 
+  tissue_health() %>%
+  group_by(species, duration, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health))
+
+apal_comp2 <- apal_comp1 %>% filter(duration == 3)
+
+apal_comp2 %>%
+  plot_ly(x = ~factor(geno), 
+          y = ~mortality_rate, 
+          hoverinfo = "text", 
+          text = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
+  add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
+  add_bars(data = apal_comp1, color = ~factor(geno), frame = ~duration) %>%
+  layout(xaxis = list(title = "Apal Genotype"),
+         yaxis = list(title = "Mortality Rate"),
+         title = "How Does Mortality Rate Change Over 3 Months?",
+          plot_bgcolor = "whitesmoke") %>%
+  animation_slider(currentvalue = list(prefix = "Survey Month: ")) %>%
+  hide_legend()
+  
+```
+
+<br>
+#############
+Separating the mortality rate findings by site reveals which site have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
+<br>
+*Note: clicking on the legend names allows you to filter the chart.*
+#############
+<br>
+
+```{r apal mortality by geno and site}
+
+apal_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) %>%
+  plot_ly(x = ~factor(geno), 
+          y = ~mortality_rate, 
+          color = ~site, 
+          hoverinfo = "text", 
+          text = ~paste0("Site: ", site, "<br>",
+                         "Geno: ",geno, "<br>", 
+                         "Mortality Rate: ", round(mortality_rate, 2), "%")) %>%
+    add_bars(width = 0.5, position = "jitter") %>%
+    layout(xaxis = list(title = "Apal Genotype"),
+           yaxis = list(title = "Mortality Rate"),
+           title = "Apal Mortality Rate by Site",
+           legend = list(x=1, y=.5, title = list(text = "Site")),
+            plot_bgcolor = "whitesmoke")
+
+```
+
+<br>
+#############
+The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
+#############
+<br>
+
+```{r apal tissue health by geno}
+
+apal_health.plot <- apal_latest %>%
+  tissue_health() %>%
+  group_by(geno) %>%
+  mutate(med_tissue = median(weighted_health))
+
+plot_ly(apal_health.plot, 
+        x = ~factor(geno),
+        y = ~weighted_health,
+        color = ~factor(geno)) %>%
+  add_boxplot() %>%
+  layout(xaxis = list(title = "Apal Genotype"),
+         yaxis = list(title = "Apal Average Tissue Health"),
+         title = "Apal Average Tissue Health") %>%
+  hide_legend()
+
+```
+
+<br>
+#############
+The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+<br>
+*Note: clicking on the legend names allows you to filter the chart.*
+#############
+<br>
+
+```{r apal tissue health by site}
+
+apal_all %>%
+  tissue_health() %>%
+  plot_ly(x = ~factor(geno),
+          y = ~weighted_health,
+          color = ~site,
+          hoverinfo = "text",
+          text = ~paste0("Site: ", site, "<br>",
+                         "Geno: ", geno,  "<br>",
+                         "Tissue Health: ", round(weighted_health, 2), "%")) %>%
+  add_markers() %>%
+  layout(xaxis = list(title = "Apal Genotype<br>"),
+         yaxis = list(title = "Percent of Healthy Tissue"),
+         title = "Apal Tissue Health by Site",
+         legend = list(x=1, y=.5, title = list(text = "Site")),
+         plot_bgcolor = "whitesmoke")
+
+```
+
+<br>
+#############
+A negative correlation between mortality rate and tissue health exists.  The linear regression line below highlights the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
+#############
+<br>
+
+```{r apal mortality vs tissue health}
+
+apal4model <- apal_latest %>%
+  tissue_health() %>%
+  group_by(species, site, geno, duration) %>%
+  summarize(num_outplanted = sum(n_outplanted),
+            num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
+            avg_health = mean(weighted_health)) %>%
+  arrange(mortality_rate) 
+
+print(paste0("The correlation between mortality rate and tissue health is ", round(cor(apal4model$mortality_rate, apal4model$avg_health),3), "."))
+             
+apalmod <- lm(mortality_rate ~ avg_health, data = apal4model)
+apalmod
+anova(apalmod)
+
+ggplot(apal4model, aes(x = mortality_rate, y = avg_health)) +
+  geom_point(aes(shape = site, color = site)) +
+  geom_smooth(se = FALSE, method = lm, color = "cornflowerblue") +
+  labs(x = "Mortality Rate",
+         y = "Average Tissue Health",
+         color = "Site",
+         shape = "Site",
+         title = "Apal Tissue Health vs. Mortality Rate") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+<br>
+
+### Apal Portfolio Analysis
+<br>
+
+#############
+The goals are Reef Renewal Bonaire are to successfully outplant as many corals as possible but also to ensure new reefs are genomicaly diverse.  Thus, the driving question is how to achieve both goals with maximial efficiency of time and resources.  One strategy could be to plant an equal number of each genotype; however, the data shows that not all genotypes are equally resilient.  As a result, I propose building a weighted portfolio of genotypes in the same manor as one might build a financial portfolio of investments.
+
+In typical portfolio analysis, the primary factors of consideration are the return on investment for each account and the standard distribution of returns (risk).  From these factors, an optimal basket of accounts is selected to achieve the desired portfolio goals.  In a portfolio of genotypes, I propose using the inverse mortality rate as the return on investment.  For example, geno #1 has an average mortality rate of 3.11%; therefore, a 96.89% survival rate (return on investment).  Similarly, geno #3 has a 21.54% average mortality rate and so there is a 78.46% average return.  The standard deviation of returns is then calculated for each genomic group of observations as a measure of risk.
+
+Having a sufficiently large sample size to calculate accurate returns and standard deviations is important.  Below, I have plotted the distribution of observations to visualize the raw sample size of each genotype.  
+#############
+<br>
+
+```{r apal creating portfolio}
+# Creating tidy apal portfolio.
+apal.port <- apal_all %>%
+  tissue_health() %>%
+  mutate(mortality_rate = (n_outplanted-(n_present - health_0)) / n_outplanted,
+         returns = 1 - mortality_rate) %>% 
+  select(geno, weighted_health, mortality_rate, returns)
+
+apal.port$mortality_rate <- replace_na(apal.port$mortality_rate, 0)
+apal.port$returns <- replace_na(apal.port$returns, 1) 
+
+# Reviewing distribution of data.
+apal.port %>% 
+  count(geno) %>%
+  mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
+  plot_ly(x = ~factor(geno), y = ~n, color = ~factor(geno), hoverinfo = "text",
+          text = ~paste0("Observations: ", n, "<br>",
+                          "Percent of Total: ", percent, "%", "<br>")) %>%
+  add_bars() %>%
+  layout(xaxis = list(title = "Apal Genotypes"),
+        yaxis = list(title = "Observations"),
+        title = "Distribution of Observations") %>%
+  hide_legend()
+
+
+# Creating aggregate portfolio by geno.
+apal.port.agg <- apal.port %>%
+  group_by(geno) %>%
+  summarize(avg_health = mean(weighted_health),
+            avg_mortality = mean(mortality_rate),
+            avg_returns = mean(returns),
+            sd = sd(returns),
+            observations = n())
+
+```
+
+<br>
+
+Additionally, the chart below shows the relationship between average return and standard deviation.
+
+<br>
+
+```{r apal portolio return vs sd }
+
+plot_ly(apal.port.agg, x = ~sd, 
+                      y = ~avg_returns, 
+                      color = ~factor(geno),
+                      hoverinfo = "text", 
+                      text = ~paste0("Geno: ", geno, "<br>",
+                                     "Observations: ", observations, "<br>",
+                                    "Average Return: ", round(avg_returns,3), "<br>",
+                                    "Standard Deviation: ", round(sd, 3))) %>%
+                    add_markers(size = ~observations) %>%
+                    layout(xaxis = list(title = "Standard Deviation"),
+                           yaxis = list(title = "Average Returns"),
+                           title = "How Risk and Return Are Related") %>%
+                    hide_legend()
+
+# Reviewing distribution of returns for each geno with trelliscope.
+# apal.port %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
+
+```
+
+<br>
+
+#### Bootstrapping
+
+#############
+Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
+#############
+<br>
+
+```{r apal bootstrapping portfolio}
+
+# Creating bootstrap data set.
+apal.boot <- replicate(n = 1000, simplify = FALSE, expr = {
+  apal.port %>%
+  group_by(geno) %>%
+  slice_sample(prop = 1, replace = TRUE)
+ }) %>%
+  bind_rows()
+
+# Summarizing bootstrapped data by geno.
+apal.boot.agg <- apal.boot %>%
+  summarize(avg_health = mean(weighted_health),
+         avg_mortality = mean(mortality_rate),
+         avg_returns = mean(returns),
+         sd = sd(returns),
+         observations = n())
+
+```
+
+
+**Summary of Raw Data**
+```{r apal portfolio raw table}
+# Raw data summary
+print(summary(apal.port.agg[,4:6]))
+
+```
+
+**Summary of Bootstrapped Data**
+```{r apal portfolio bootstrap table}
+
+# Boostrapped data summary
+summary(apal.boot.agg[,4:6])
+
+# Checking for normal distribution.
+#apal.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
+  
+```
+<br>
+#############
+Finally, the Portfolio Analytics' optimize.portfolio function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
+<br>
+The outputs below identify the optimal weights for each genotype and the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations the model considered.  
+#############
+<br>
+
+```{r apal portfolio analysis}
+
+#Number of unique genos
+#length(unique(apal.port$geno))
+
+apal.returns.wide <- apal.boot %>%
+  select(geno, returns) %>%
+  group_by(geno) %>%
+  mutate(row = row_number()) %>%
+  pivot_wider(names_from = geno, values_from = returns) %>%
+  select(-row)
+
+apal.returns.wide <- as.ts(apal.returns.wide)
+port_spec <- portfolio.spec(assets = colnames(apal.returns.wide))
+port_spec <- add.constraint(portfolio = port_spec, type = "full_investment")
+port_spec <- add.constraint(portfolio = port_spec, type = "long_only")
+port_spec <- add.objective(portfolio = port_spec, type = "return", name = "mean")
+port_spec <- add.objective(portfolio = port_spec, type = "risk", name = "StdDev")
+port_spec <- add.constraint(portfolio = port_spec, type = "box",
+                                  min = 0.01, max = 0.4, 
+                                  indexnum = 2)
+
+set.seed(2)
+apal.opt <- optimize.portfolio(apal.returns.wide,
+                          portfolio = port_spec,
+                          optimize_method = "random",
+                          search_size = 20000,
+                          trace = TRUE)
+
+# Visualizing results.
+apal.opt
+chart.Weights(apal.opt)
+chart.RiskReward(apal.opt, risk.col = "StdDev", return.col = "mean", chart.assets = FALSE,
+                 main = "Optimal Apal Portfolio")
+
+```
+
 
 ## Actionable Opportunities
 Glue: Cement vs Epoxy
