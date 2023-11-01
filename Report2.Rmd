@@ -35,12 +35,17 @@ setwd("~/Documents/Data Science/Reef Renewal Bonaire")
 
 ###Monitoring Summary
 ltsummary <- read_excel("Monitoring Summary.xlsx", 
-                    sheet = 4, 
-                    range = 'A3:N24',
-                    col_names = c("site_name", "site_code", "species", "op_date", "subsite", 
-                                  "survey_date","duration", "time_code", "eco_footprint",
+                    sheet = 2, 
+                    range = 'A3:L28',
+                    col_names = c("site_name", "site_code", "species", "subsite",
+                                  "survey_date","time_code", "eco_footprint",
                                   "tot_coral_area", "restored_area", "perc_coral_cover", 
                                   "coral_density", "restored_size_cm"))
+
+eco_summary <- read_excel("Monitoring Summary.xlsx", 
+                    sheet = 4, 
+                    range = 'A2:D44',
+                    col_names = c("site_name", "site_code", "year", "eco_footprint"))
 
 ##### Acer Data
 # Mi Dushi I Survey
@@ -362,6 +367,67 @@ All calculations and visualizations are performed using R.  R packages for this 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
 ## Overview of Restoration Efforts
+
+```{r, foramtting Ltsummary}
+### Removing NAs  
+ltsummary <- ltsummary %>% drop_na(eco_footprint)
+
+```
+
+The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from RRB's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
+
+```{r ecological footprint}
+
+ltsummary %>% 
+  ggplot(aes(x=survey_date, y=eco_footprint, color = site_name, shape = species)) +
+    geom_point(size = 3) +
+    geom_line() + 
+    labs(x = 'Time', 
+         y = 'Eco-Footprint (m)',
+         color = 'Site',
+         shape = 'Species',
+         title = 'Change in Ecological Footprints Over Time') 
+
+```
+
+
+```{r longterm total coral area}
+ltsummary %>% 
+  ggplot(aes(x=survey_date, y=tot_coral_area, color = site_name, shape = species)) +
+    geom_point(size = 3) +
+    geom_line() + 
+    labs(x = 'Time', 
+         y = 'Total Coral Area (m)',
+         color = 'Site',
+         shape = 'Species',
+         title = 'Change in Total Coral Area Over Time')
+```
+
+
+In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values, or can be quite similar, during the early years of growth.
+
+```{r, eco growth by metric, message=FALSE}
+ltsummary_long <- ltsummary %>% 
+  pivot_longer("eco_footprint":"restored_area", 
+               names_to = "metric",
+               values_to = "values") 
+
+ltsummary_long %>%
+  ggplot(aes(x=survey_date, y=values, color=metric, shape=species)) +
+    geom_point(size = 3) +
+    geom_line() + 
+    facet_wrap(vars(site_name)) +
+    scale_color_discrete(labels = c("Eco-Footprint", "Restored Area", "Total Coral Area")) +
+    labs(x = 'Time', 
+         y = 'Growth (m)',
+         color = 'Metric',
+         shape = 'Species',
+         title = 'Long-Term Growth by Site') +
+    guides(color=guide_legend(override.aes=list(shape=15))) 
+
+```
+
+
 
 ## Species: Acer
 Mi Dushi I: 13-month
