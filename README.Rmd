@@ -241,8 +241,8 @@ nice_table(title = "Carl's Hill 3-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 ```{r carls hill 3 month mortality}
-ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate, fill= factor(geno))) +
-  geom_col() +
+ggplot(carl3_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -310,8 +310,8 @@ nice_table(title = "Carl's Hill 6-Month Survey: Ranking Genotypes by Average Tis
 
 
 ```{r carls hill 6 month mortality}
-ggplot(carl6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(carl6_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -422,8 +422,8 @@ nice_table(title = "Yellowman A 3-Month Survey: Ranking Genotypes by Average Tis
 
 ```{r Yellowman A 3 Month mortality}
 
-ggplot(yellowmanA3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(yellowmanA3_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -492,8 +492,8 @@ nice_table(title = "Yellowman A 6-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 ```{r Yellowman A 6 month mortality}
-ggplot(yellowmanA6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(yellowmanA6_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -594,8 +594,8 @@ nice_table(title = "Yellowman B 3-Month Survey: Ranking Genotypes by Average Tis
 ```
 
 ```{r Yellowman B 3 month mortality}
-ggplot(yellowmanB3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(yellowmanB3_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -665,8 +665,8 @@ nice_table(title = "Yellowman B 6-Month Survey: Ranking Genotypes by Average Tis
 
 
 ```{r Yellowman B 6 month mortality}
-ggplot(yellowmanB6_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(yellowmanB6_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
@@ -768,8 +768,8 @@ nice_table(title = "Yellowman C 3-Month Survey: Ranking Genotypes by Average Tis
 
 
 ```{r Yellowman C 3 Month Mortality}
-ggplot(yellowmanC3_agg, aes(x=factor(geno), y=mortality_rate, fill=factor(geno))) +
-  geom_col() +
+ggplot(yellowmanC3_agg, aes(x=factor(geno), y=mortality_rate)) +
+  geom_col(fill = "deepskyblue4") +
   scale_y_continuous(limits = c(-10,80), labels=scales::percent_format(scale=1)) +
   labs(x="Genotype", 
        y="Mortality Rate",
