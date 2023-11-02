@@ -619,8 +619,7 @@ acer_health.plot <- acer_latest %>%
 
 plot_ly(acer_health.plot, 
         x = ~factor(geno),
-        y = ~weighted_health,
-        color = ~factor(geno)) %>%
+        y = ~weighted_health) %>%
   add_boxplot() %>%
   layout(xaxis = list(title = "Acer Genotype"),
          yaxis = list(title = "Acer Average Tissue Health"),
@@ -719,7 +718,7 @@ acer.port$returns <- replace_na(acer.port$returns, 1)
 acer.port %>% 
   count(geno) %>%
   mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
-  plot_ly(x = ~factor(geno), y = ~n, color = ~factor(geno), hoverinfo = "text",
+  plot_ly(x = ~factor(geno), y = ~n, hoverinfo = "text",
           text = ~paste0("Observations: ", n, "<br>",
                           "Percent of Total: ", percent, "%", "<br>")) %>%
   add_bars() %>%
@@ -908,7 +907,7 @@ apal_all %>%
   group_by(species, site, duration) %>%
   ggplot(aes(x=site, fill = factor(duration))) +
   geom_bar() +
-  scale_fill_brewer(palette = "Paired", direction = -1) +
+  scale_fill_brewer(palette = "Paired") +
   labs(x = "Site",
        y = "Count",
        fill = "Survey Month",
@@ -1058,8 +1057,7 @@ apal_health.plot <- apal_latest %>%
 
 plot_ly(apal_health.plot, 
         x = ~factor(geno),
-        y = ~weighted_health,
-        color = ~factor(geno)) %>%
+        y = ~weighted_health) %>%
   add_boxplot() %>%
   layout(xaxis = list(title = "Apal Genotype"),
          yaxis = list(title = "Apal Average Tissue Health"),
@@ -1159,7 +1157,7 @@ apal.port$returns <- replace_na(apal.port$returns, 1)
 apal.port %>% 
   count(geno) %>%
   mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
-  plot_ly(x = ~factor(geno), y = ~n, color = ~factor(geno), hoverinfo = "text",
+  plot_ly(x = ~factor(geno), y = ~n, hoverinfo = "text",
           text = ~paste0("Observations: ", n, "<br>",
                           "Percent of Total: ", percent, "%", "<br>")) %>%
   add_bars() %>%
