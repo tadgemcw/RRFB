@@ -378,15 +378,16 @@ The following visuals highlight the changes in ecological footprints and total c
 
 ```{r ecological footprint}
 
-ltsummary %>% 
-  ggplot(aes(x=survey_date, y=eco_footprint, color = site_name, shape = species)) +
-    geom_point(size = 3) +
-    geom_line() + 
-    labs(x = 'Time', 
-         y = 'Eco-Footprint (m)',
-         color = 'Site',
-         shape = 'Species',
-         title = 'Change in Ecological Footprints Over Time') 
+eco_summary %>%
+  plot_ly(x = ~year, y = ~eco_footprint, color = ~site_name,
+          mode = "lines+markers",
+          hoverinfo = "text",
+          text = ~paste0("Site: ", site_name, "<br>",
+                         "Year: ", year, "<br>",
+                         "Eco-footprint: ", eco_footprint)) %>%
+  layout(xaxis = list(title = "Year"),
+         yaxis = list(title = "Eco-Footprint (m)"),
+         title = "Change in Ecological Footprint Over Time")
 
 ```
 
