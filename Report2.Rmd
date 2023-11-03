@@ -361,8 +361,14 @@ x %>% rename("Species" = species,
 ## Methodology
 
 This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided after detailed surveys of the outplanted sites.  
-Mortality rates are a standard calculation of (corals present - dead corals) / corals outplanted.  Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
-All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, , *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
+
+Coral cover percentage is calculated as (total coral area / eco-footprint) * 100.
+
+Mortality rates are a standard calculation of (corals present - dead corals) / corals outplanted.
+
+Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
+
+All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
@@ -370,7 +376,7 @@ All calculations and visualizations are performed using R.  R packages for this 
 
 ```{r, foramtting Ltsummary}
 ### Removing NAs  
-ltsummary <- ltsummary %>% drop_na(eco_footprint)
+ltsummary <- ltsummary %>% select(-subsite) %>% drop_na(eco_footprint)
 
 ```
 
@@ -389,55 +395,39 @@ eco_summary %>%
          yaxis = list(title = "Eco-Footprint (m)"),
          title = "Change in Ecological Footprint Over Time")
 
+eco_summary %>%
+  ggplot(aes(x = year, y = eco_footprint)) +
+  geom_line() +
+  geom_point() + 
+  facet_wrap(~site_name) +
+  labs(x = "Year",
+       y = "Eco-Footprint (m)",
+       title = "Change in Eco-Footrpint by Site")
+
 ```
 
 
-```{r longterm total coral area}
-ltsummary %>% 
-  ggplot(aes(x=survey_date, y=tot_coral_area, color = site_name, shape = species)) +
-    geom_point(size = 3) +
-    geom_line() + 
-    labs(x = 'Time', 
-         y = 'Total Coral Area (m)',
-         color = 'Site',
-         shape = 'Species',
-         title = 'Change in Total Coral Area Over Time')
-```
-
-
-In the visual below, I have highlighted the change in Eco Footprint, Total Coral Area, and Restored Area over time by site.  As additional surveys are added, it may be possible to tune a model to predict future trends.  Please note that the Total Coral Area and Restored Area often share the same values, or can be quite similar, during the early years of growth.
+In the visual below, I have plotted the change in Coral Cover as a percentage over time and by site.  As previously noted, this calculation is the total area of coral cover / the size of the eco-footprint.  It represents the density of coral coverage for a given site.
 
 ```{r, eco growth by metric, message=FALSE}
-ltsummary_long <- ltsummary %>% 
-  pivot_longer("eco_footprint":"restored_area", 
-               names_to = "metric",
-               values_to = "values") 
 
-ltsummary_long %>%
-  ggplot(aes(x=survey_date, y=values, color=metric, shape=species)) +
-    geom_point(size = 3) +
-    geom_line() + 
-    facet_wrap(vars(site_name)) +
-    scale_color_discrete(labels = c("Eco-Footprint", "Restored Area", "Total Coral Area")) +
-    labs(x = 'Time', 
-         y = 'Growth (m)',
-         color = 'Metric',
-         shape = 'Species',
-         title = 'Long-Term Growth by Site') +
-    guides(color=guide_legend(override.aes=list(shape=15))) 
+ltsummary %>%
+  mutate(coral_cover = (tot_coral_area / eco_footprint)*100) %>%
+  plot_ly(x = ~survey_date, y = ~coral_cover, color = ~site_name, mode = "lines+markers",
+          hoverinfo = "text",
+          text = ~paste0("Site: ", site_name, "<br>",
+                         "Year: ", year(survey_date), "<br>",
+                         "Coral Cover: ", round(coral_cover,2), "%")) %>%
+  layout(xaxis = list(title = "Year"),
+         yaxis = list(title = "Coral Cover (%)"),
+         title = "Change in Coral Cover Over Time")
 
 ```
-
 
 
 ## Species: Acer
-Mi Dushi I: 13-month
-Punt Vierkant: 3-month, 6-month
-Yellowman A: 3-month, 6-month
-Yellowman B: 3-month, 6-month
-Yellowman C: 3-month
 
-### Acer Overview
+The Acer species, commonly known as Staghorn Coral, has been outplanted at the following sites: Mi Dushi I, Punt Vierkant, and Yellowman (subsites A-C).  
 
 The Acer data consists of survey from five sites: Mi Dushi, Punt Vierkant, Yellowman A, B, and C.  The Mi Dushi survey was taken 13 months after outplanting.  Data was provided from three- and six-month surveys for Punt VierKant, Yellowman A, and B.  All data utilized from Yellowman C is from a three-month survey.
 
@@ -463,6 +453,10 @@ acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 ```
 
+### Acer Summary
+
+Below is a distribution of survey data collected by site and survey time since outplanting.
+
 
 ```{r plotting distribution of acer_all data}
 
@@ -480,7 +474,7 @@ acer_all %>%
 
 <br>
 
-The table below lists the summary statistics for each Acer site.
+The table below lists summary statistics for each Acer site.
 
 <br>
 
@@ -504,6 +498,8 @@ acer_latest %>%
 ```
 
 <br>
+
+### Acer Mortality Rates
 
 The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
 
@@ -546,12 +542,10 @@ comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
 
 acer_comp1 <- acer_all %>%
   filter(site %in% comparison_sites) %>% 
-  tissue_health() %>%
   group_by(species, duration, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health))
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100)
 
 acer_comp2 <- acer_comp1 %>% filter(duration == 3)
 
@@ -559,7 +553,7 @@ acer_comp2 %>%
   plot_ly(x = ~factor(geno), 
           y = ~mortality_rate, 
           hoverinfo = "text", 
-          text = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
+          hovertext = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
   add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
   add_bars(data = acer_comp1, color = ~factor(geno), frame = ~duration) %>%
   layout(xaxis = list(title = "Acer Genotype"),
@@ -607,6 +601,8 @@ acer_latest %>%
 
 <br>
 
+### Acer Tissue Health
+
 The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
 
 <br>
@@ -632,6 +628,7 @@ plot_ly(acer_health.plot,
 <br>
 
 The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
 
@@ -720,7 +717,7 @@ acer.port %>%
   count(geno) %>%
   mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
   plot_ly(x = ~factor(geno), y = ~n, hoverinfo = "text",
-          text = ~paste0("Observations: ", n, "<br>",
+          hovertext = ~paste0("Observations: ", n, "<br>",
                           "Percent of Total: ", percent, "%", "<br>")) %>%
   add_bars() %>%
   layout(xaxis = list(title = "Acer Genotypes"),
@@ -758,8 +755,8 @@ plot_ly(acer.port.agg, x = ~sd,
                                     "Standard Deviation: ", round(sd, 3))) %>%
                     add_markers(size = ~observations) %>%
                     layout(xaxis = list(title = "Standard Deviation"),
-                           yaxis = list(title = "Average Returns"),
-                           title = "How Risk and Return Are Related") %>%
+                           yaxis = list(title = "Acer Average Returns"),
+                           title = "How Acer Risk and Return Are Related") %>%
                     hide_legend()
 
 # Reviewing distribution of returns for each geno with trelliscope.
@@ -815,7 +812,7 @@ summary(acer.boot.agg[,4:6])
 ```
 <br>
 
-Finally, the Portfolio Analytics' optimize.portfolio function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
+Finally, the Portfolio Analytics' *optimize.portfolio* function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
 <br>
 The outputs below identify the optimal weights for each genotype and the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations the model considered.  
 
@@ -861,16 +858,11 @@ chart.RiskReward(acer.opt, risk.col = "StdDev", return.col = "mean", chart.asset
 <br>
 
 ## Species: Apal
-Carl’s Hill: 3-month, 6-month
-Knife I A: 1-month, 5-month, 6-month
-Knife I B: 3-month, 6-month
-Knife I C: 3-month, 6-month
-Oil Slick: 1-month, 7-month, 13-month
-Southbay II: 0.5-month, 18-month
 
-### Apal Overview
 
-The Apal data consists of survey from four sites: Carl's Hill, Knife I (A-C), Oil Slick, and Southbay II.  
+The Apal speices, commonly known as Elkhorn coral, has been outplanted at the following sites: Carl's Hill, Knife I (subsites A-C), Oil Slick Leap, and South Bay II.
+
+The Carl's Hill, Knife IB, and Knife IC surveys were taken three- and six-months after outplanting.  Data was provided from one-, five, and six-month surveys for Knife IA.  Data from Oil Slick Leap was collected one-, seven-, and 13-months after outplanting, and the Southbay II data was collected at a half-month and 18 months from outplanting.
 
 <br>
 
@@ -901,6 +893,10 @@ apal_all$duration <- apal_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 ```
 
+### Apal Summary
+
+Below highlights the distribution of data collected.
+<br>
 
 ```{r plotting distribution of apal_all data}
 
@@ -918,7 +914,7 @@ apal_all %>%
 
 <br>
 
-The table below lists the summary statistics for each Apal site.
+The table below lists summary statistics for each Apal site.
 
 <br>
 
@@ -942,11 +938,13 @@ apal_latest %>%
 ```
 
 <br>
-#####################
-The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
 
-Genos #3, #9, #14, and #22 have the highest mortality rates.  This corresponds with the average tissue health, indicating these are perhaps the least successful genos.  Conversely, genos #7-8, #12, #24, and #26 have performed better than the rest.  
-#######################
+### Apal Mortality Rate
+
+The plots below highlight differences on the genomic level.  As with the Acer data, when multiple surveys were provided for a site, the latest (most recent) data was used.  
+
+Genos #16, #17, and #22 have the highest mortality rates.  Unlike the Acer date, these genos do not  correspond with the average tissue health statistics. Conversely, genos #9-10, and #13 have performed better than the rest.  
+
 <br>
 
 ```{r plotting apal_all data}
@@ -974,22 +972,22 @@ ggplotly(apal_mortality.plot, tooltip = "text")
 ```
 
 <br>
-#################
-Below, I isolated the data to site with both three- and six-month surveys (Punt Vierkant, Yellowman A, and Yellowman B) and plotted the change in mortality rate over time.  The data indicates that while a three-month survey may be reasonable for obtaining a baseline of outplanting success for some genos, others (#9, #14, #22, and #25 for example) may take longer to fully establish.
-##################
+As with the Acer data, I filtered the Apal data to sites with both three- and six-month surveys (Carl's Hill, Knife IB and Knife IC) and plotted the change in mortality rate over time.  
+
+It should be noted that instances in which mortality decreased also correspond with a decrease in sample size.  For example, the three-month surveys of geno #23 shows a total of 20 outplanted observations; however the six-month surveys show a total of only 10 outplanted observations.  It appears that not all clusters were re-surveyed.
+
 <br>
 
 ```{r apal 3- to 6-month mortality}
-apal_comparison_sites <- c("Carl's Hill", "Knife B", "Knife C")
+
+apal_durations <- c(3, 6)
 
 apal_comp1 <- apal_all %>%
-  filter(site %in% apal_comparison_sites) %>% 
-  tissue_health() %>%
+  filter(duration %in% apal_durations) %>%
   group_by(species, duration, geno) %>%
   summarize(num_outplanted = sum(n_outplanted),
             num_survived = sum(n_present, na.rm = TRUE) - sum(health_0, na.rm=TRUE),
-            mortality_rate = 100 - sum(num_survived / num_outplanted)*100,
-            avg_health = mean(weighted_health))
+            mortality_rate = 100 - sum(num_survived / num_outplanted)*100)
 
 apal_comp2 <- apal_comp1 %>% filter(duration == 3)
 
@@ -997,7 +995,7 @@ apal_comp2 %>%
   plot_ly(x = ~factor(geno), 
           y = ~mortality_rate, 
           hoverinfo = "text", 
-          text = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
+          hovertext = ~paste0("Mortality Rate: ", round(mortality_rate,2), "%")) %>%
   add_markers(marker = list(color = toRGB("gray15"), size = 5)) %>%
   add_bars(data = apal_comp1, color = ~factor(geno), frame = ~duration) %>%
   layout(xaxis = list(title = "Apal Genotype"),
@@ -1006,7 +1004,7 @@ apal_comp2 %>%
           plot_bgcolor = "whitesmoke") %>%
   animation_slider(currentvalue = list(prefix = "Survey Month: ")) %>%
   hide_legend()
-  
+
 ```
 
 <br>
@@ -1159,7 +1157,7 @@ apal.port %>%
   count(geno) %>%
   mutate(percent = paste0(round(100 * n / sum(n),2),"%")) %>%
   plot_ly(x = ~factor(geno), y = ~n, hoverinfo = "text",
-          text = ~paste0("Observations: ", n, "<br>",
+          hovertext = ~paste0("Observations: ", n, "<br>",
                           "Percent of Total: ", percent, "%", "<br>")) %>%
   add_bars() %>%
   layout(xaxis = list(title = "Apal Genotypes"),
