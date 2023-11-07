@@ -636,7 +636,7 @@ The graph below is a raw breakdown of average tissue health by geno and by site.
 
 ```{r acer tissue health by site}
 
-acer_all %>%
+acer_latest %>%
   tissue_health() %>%
   plot_ly(x = ~factor(geno),
           y = ~weighted_health,
@@ -662,7 +662,7 @@ A negative correlation between mortality rate and tissue health exists.  The lin
 
 ```{r acer mortality vs tissue health}
 
-acer4model <- acer_latest %>%
+acer4model <- acer_all %>%
   tissue_health() %>%
   group_by(species, site, geno, duration) %>%
   summarize(num_outplanted = sum(n_outplanted),
@@ -766,7 +766,7 @@ plot_ly(acer.port.agg, x = ~sd,
 
 <br>
 
-#### Bootstrapping
+#### Acer Bootstrapping
 
 Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
 
@@ -811,6 +811,7 @@ summary(acer.boot.agg[,4:6])
   
 ```
 <br>
+#### Acer Portfolio
 
 Finally, the Portfolio Analytics' *optimize.portfolio* function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
 <br>
@@ -819,9 +820,6 @@ The outputs below identify the optimal weights for each genotype and the anticip
 <br>
 
 ```{r acer portfolio analysis}
-
-#Number of unique genos
-#length(unique(acer.port$geno))
 
 acer.returns.wide <- acer.boot %>%
   select(geno, returns) %>%
@@ -837,7 +835,7 @@ port_spec <- add.constraint(portfolio = port_spec, type = "long_only")
 port_spec <- add.objective(portfolio = port_spec, type = "return", name = "mean")
 port_spec <- add.objective(portfolio = port_spec, type = "risk", name = "StdDev")
 port_spec <- add.constraint(portfolio = port_spec, type = "box",
-                                  min = 0.01, max = 0.4, 
+                                  min = 0.01, max = 0.25, 
                                   indexnum = 2)
 
 set.seed(2)
@@ -1008,11 +1006,12 @@ apal_comp2 %>%
 ```
 
 <br>
-#############
-Separating the mortality rate findings by site reveals which site have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
+
+Separating the mortality rate findings by site reveals which site have performed better than others.  Genos #6-11 have more stable mortality rates across site than, say, genos #2, 19, and 22.
+
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
-#############
+
 <br>
 
 ```{r apal mortality by geno and site}
@@ -1042,16 +1041,14 @@ apal_latest %>%
 ```
 
 <br>
-#############
-The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
-#############
+
+
 <br>
 
 ```{r apal tissue health by geno}
 
 apal_health.plot <- apal_latest %>%
   tissue_health() %>%
-  group_by(geno) %>%
   mutate(med_tissue = median(weighted_health))
 
 plot_ly(apal_health.plot, 
@@ -1066,16 +1063,16 @@ plot_ly(apal_health.plot,
 ```
 
 <br>
-#############
-The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
+
+Filtering the breakdown of average tissue health by geno and by site helps to identify the distribution of observations by geno.  Oil Slick Leap has the most healthy distribution of corals, while Carl's Hill and Knife A appear more widely distributed.
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
-#############
+
 <br>
 
 ```{r apal tissue health by site}
 
-apal_all %>%
+apal_latest %>%
   tissue_health() %>%
   plot_ly(x = ~factor(geno),
           y = ~weighted_health,
@@ -1094,14 +1091,14 @@ apal_all %>%
 ```
 
 <br>
-#############
-A negative correlation between mortality rate and tissue health exists.  The linear regression line below highlights the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
-#############
+
+As with the Acer data, a negative correlation between mortality rate and tissue health exists.  The linear regression line highlights the relationship. Again, I use an ANOVA test to confirm the model is statistically significant. 
+
 <br>
 
 ```{r apal mortality vs tissue health}
 
-apal4model <- apal_latest %>%
+apal4model <- apal_all %>%
   tissue_health() %>%
   group_by(species, site, geno, duration) %>%
   summarize(num_outplanted = sum(n_outplanted),
@@ -1132,13 +1129,8 @@ ggplot(apal4model, aes(x = mortality_rate, y = avg_health)) +
 ### Apal Portfolio Analysis
 <br>
 
-#############
-The goals are Reef Renewal Bonaire are to successfully outplant as many corals as possible but also to ensure new reefs are genomicaly diverse.  Thus, the driving question is how to achieve both goals with maximial efficiency of time and resources.  One strategy could be to plant an equal number of each genotype; however, the data shows that not all genotypes are equally resilient.  As a result, I propose building a weighted portfolio of genotypes in the same manor as one might build a financial portfolio of investments.
+The process to model the Apal portfolio is the same as for the Acer species.  The raw data is reviewed, bootstrapped, and modeled with the same portfolio weight requirements.
 
-In typical portfolio analysis, the primary factors of consideration are the return on investment for each account and the standard distribution of returns (risk).  From these factors, an optimal basket of accounts is selected to achieve the desired portfolio goals.  In a portfolio of genotypes, I propose using the inverse mortality rate as the return on investment.  For example, geno #1 has an average mortality rate of 3.11%; therefore, a 96.89% survival rate (return on investment).  Similarly, geno #3 has a 21.54% average mortality rate and so there is a 78.46% average return.  The standard deviation of returns is then calculated for each genomic group of observations as a measure of risk.
-
-Having a sufficiently large sample size to calculate accurate returns and standard deviations is important.  Below, I have plotted the distribution of observations to visualize the raw sample size of each genotype.  
-#############
 <br>
 
 ```{r apal creating portfolio}
@@ -1179,7 +1171,7 @@ apal.port.agg <- apal.port %>%
 
 <br>
 
-Additionally, the chart below shows the relationship between average return and standard deviation.
+The chart below shows the relationship between average return and standard deviation.
 
 <br>
 
@@ -1206,11 +1198,10 @@ plot_ly(apal.port.agg, x = ~sd,
 
 <br>
 
-#### Bootstrapping
+#### Apal Bootstrapping
 
-#############
-Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
-#############
+Again, via the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
+
 <br>
 
 ```{r apal bootstrapping portfolio}
@@ -1252,11 +1243,9 @@ summary(apal.boot.agg[,4:6])
   
 ```
 <br>
-#############
-Finally, the Portfolio Analytics' optimize.portfolio function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
-<br>
-The outputs below identify the optimal weights for each genotype and the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations the model considered.  
-#############
+#### Apal Portfolio
+
+The same portfolio constraints and objectives are used for the Apal data.  
 <br>
 
 ```{r apal portfolio analysis}
@@ -1278,7 +1267,7 @@ port_spec <- add.constraint(portfolio = port_spec, type = "long_only")
 port_spec <- add.objective(portfolio = port_spec, type = "return", name = "mean")
 port_spec <- add.objective(portfolio = port_spec, type = "risk", name = "StdDev")
 port_spec <- add.constraint(portfolio = port_spec, type = "box",
-                                  min = 0.01, max = 0.4, 
+                                  min = 0.01, max = 0.25, 
                                   indexnum = 2)
 
 set.seed(2)
@@ -1296,8 +1285,5 @@ chart.RiskReward(apal.opt, risk.col = "StdDev", return.col = "mean", chart.asset
 
 ```
 
-
-## Actionable Opportunities
-Glue: Cement vs Epoxy
 
 ## Conclusions
