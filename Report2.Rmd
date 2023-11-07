@@ -2,7 +2,7 @@
 title: "Improving Reef Resilience with Portfolio Analysis"
 subtitle: "A Collaboration with Reef Renewal Bonaire"
 author: "Tadge McWilliams"
-date: "Updated 2023-10-23"
+date: "2023-11-07"
 output: 
   html_document:
     toc: TRUE
@@ -315,28 +315,6 @@ x %>%
     arrange(mortality_rate)
 }
 
-# Creating ggplot function for mortality rate plot.
-gg_mortality <- function(x,...) {
-ggplot(x, aes(x=factor(geno), y=mortality_rate, fill= mortality_rate)) +
-  geom_col() +
-  scale_y_continuous(labels=scales::percent_format(scale=1)) +
-  labs(x="Genotype", 
-       y="Mortality Rate",
-       fill="Genotype") + 
-  theme(legend.position = "none") +
-    theme(plot.title = element_text(face = "italic"))
-}
-
-# Creating ggplot function for average tissue health plot.
-gg_tissue_health <- function(x,...) {
-  ggplot(x, aes(x = factor(geno), y = weighted_health)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 5)) +
-  labs(x = "Genotype", 
-       y = "Percent of Healthy Tissue") + 
-    theme(plot.title = element_text(face = "italic"))
-}
-
 #Creating function for nice_table formatting. Input must be the aggregate object.
 table_format <- function(x) {
 x$mortality_rate <- paste0(round(x$mortality_rate, 2), "%")
@@ -358,9 +336,12 @@ x %>% rename("Species" = species,
 
 ## Summary
 
+Today, coral reef restoration is largely under valued and under funded by much of the world.  Yet our ability to propagate and grow new coral reefs is a vital piece in the fight to manage our changing climate.  From this imbalance, the realities and constraints of operational resources cannot be ignored.  Outplanting new reefs must be done with maximum efficiency.  
+The feature of this report attempts to utilize financial portfolio analysis to construct a genomic portfolio from which organizations may optimize their resources and outplant new reefs with increased efficiency.  The models developed for two coral species show that improvements to overall reef survival rates are possible when the proportions of genotypes are weighted to achieve the desired portfolio goals.  More analysis is needed support the long term success and tuning of such a portfolio; however, the models suggest that immediate gains can be made.
+
 ## Methodology
 
-This analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided after detailed surveys of the outplanted sites.  
+The basic analysis is intended to adhere to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* All data was provided by RRB.  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided from detailed underwater surveys of the outplanted reefs  
 
 Coral cover percentage is calculated as (total coral area / eco-footprint) * 100.
 
@@ -368,11 +349,11 @@ Mortality rates are a standard calculation of (corals present - dead corals) / c
 
 Average tissue health is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
 
-All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to a GitHub repository.
+All calculations and visualizations are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to GitHub.
 
 [^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
-## Overview of Restoration Efforts
+## Eco-Footprint
 
 ```{r, foramtting Ltsummary}
 ### Removing NAs  
@@ -380,7 +361,9 @@ ltsummary <- ltsummary %>% select(-subsite) %>% drop_na(eco_footprint)
 
 ```
 
-The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from RRB's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been surveyed equally.  
+The following visuals highlight the changes in ecological footprints and total coral coverage from year to year.  Data from RRB's long-term surveys was used for this section.  As new outplanting sites are created each year, not all sites have been equally surveyed.  
+
+<br>
 
 ```{r ecological footprint}
 
@@ -402,12 +385,15 @@ eco_summary %>%
   facet_wrap(~site_name) +
   labs(x = "Year",
        y = "Eco-Footprint (m)",
-       title = "Change in Eco-Footrpint by Site")
+       title = "Change in Eco-Footrpint by Site") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
 
-In the visual below, I have plotted the change in Coral Cover as a percentage over time and by site.  As previously noted, this calculation is the total area of coral cover / the size of the eco-footprint.  It represents the density of coral coverage for a given site.
+In the visual below, I have plotted the change in Coral Cover as a percentage by site.  As previously noted, this calculation is the total area of coral cover, divided by the size of the eco-footprint.  It represents the density of coral coverage for a given site.
+
+<br>
 
 ```{r, eco growth by metric, message=FALSE}
 
@@ -427,11 +413,7 @@ ltsummary %>%
 
 ## Species: Acer
 
-The Acer species, commonly known as Staghorn Coral, has been outplanted at the following sites: Mi Dushi I, Punt Vierkant, and Yellowman (subsites A-C).  
-
-The Acer data consists of survey from five sites: Mi Dushi, Punt Vierkant, Yellowman A, B, and C.  The Mi Dushi survey was taken 13 months after outplanting.  Data was provided from three- and six-month surveys for Punt VierKant, Yellowman A, and B.  All data utilized from Yellowman C is from a three-month survey.
-
-<br>
+The Acer coral species, commonly known as Staghorn Coral, has been outplanted at the following sites: Mi Dushi, Punt Vierkant, Yellowman A, B, and C.  The Mi Dushi survey was taken 13 months after outplanting.  Data was provided from three- and six-month surveys for Punt VierKant, Yellowman A, and Yellowman B.  All data utilized from Yellowman C is from a three-month survey.
 
 ```{r combining acer sites}
 # Aligning class types
@@ -457,6 +439,7 @@ acer_all$duration <- acer_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 Below is a distribution of survey data collected by site and survey time since outplanting.
 
+<br>
 
 ```{r plotting distribution of acer_all data}
 
@@ -472,7 +455,6 @@ acer_all %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-<br>
 
 The table below lists summary statistics for each Acer site.
 
@@ -497,11 +479,9 @@ acer_latest %>%
   
 ```
 
-<br>
+#### Acer Mortality Rates
 
-### Acer Mortality Rates
-
-The plots below highlight differences on the genomic level.  Data was utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
+The plots below highlight differences on the genomic level.  Data is utilized from each site.  When multiple surveys were provided for a site, the latest (most recent) data was used to avoid duplication.  Specifically, the three-month surveys for Punt Vierkant, Yellowman A, and Yellowman B were omited in favor of using the six-month survey data.  The result is a snap shot of current conditions.
 
 Genos #3, #9, #14, and #22 have the highest mortality rates.  This corresponds with the average tissue health, indicating these are perhaps the least successful genos.  Conversely, genos #7-8, #12, #24, and #26 have performed better than the rest.  
 
@@ -531,9 +511,7 @@ ggplotly(acer_mortality.plot, tooltip = "text")
 
 ```
 
-<br>
-
-Below, I isolated the data to site with both three- and six-month surveys (Punt Vierkant, Yellowman A, and Yellowman B) and plotted the change in mortality rate over time.  The data indicates that while a three-month survey may be reasonable for obtaining a baseline of outplanting success for some genos, others (#9, #14, #22, and #25 for example) may take longer to fully establish.
+Below, I isolate the data to each site with both three- and six-month surveys (Punt Vierkant, Yellowman A, and Yellowman B) and plotted the change in mortality rate over time.  The data indicates that while a three-month survey may be reasonable for obtaining a baseline of outplanting success for some genos, others (#9, #14, #22, and #25 for example) may take longer to fully establish.
 
 <br>
 
@@ -565,9 +543,7 @@ acer_comp2 %>%
   
 ```
 
-<br>
-
-Separating the mortality rate findings by site reveals which site have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
+Separating the mortality rate findings by site reveals which sites have performed better than others.  That said, it is important to note that not all sites contain all genos.  Hence, site statistics may be unfairly skewed by a greater number of poorly performing genos as the they cannot be held equal.
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
 
@@ -599,11 +575,9 @@ acer_latest %>%
 
 ```
 
-<br>
+#### Acer Tissue Health
 
-### Acer Tissue Health
-
-The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth noting that genos #3 and #6 (each with higher mortality rates) have good average tissue health once a few low outliers are omitted.
+The average tissue health for each geno is generally in line with the mortality rates.  Genos #9, #14, and #22 have not performed as well as others in either measure.  It is worth mentioning that genos #3 and #6 (each with higher mortality rates) have good average tissue health if a few outliers are omitted.
 
 <br>
 
@@ -625,10 +599,7 @@ plot_ly(acer_health.plot,
 
 ```
 
-<br>
-
 The graph below is a raw breakdown of average tissue health by geno and by site.  Each recorded observation is plotted.  Filtering the data to view individual sites helps to identify the distribution of observations by geno.
-
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
 
@@ -654,9 +625,7 @@ acer_latest %>%
 
 ```
 
-<br>
-
-A negative correlation between mortality rate and tissue health exists.  The linear regression line below highlights the relationship.  I use an ANOVA test to confirm the model is statistically significant. 
+A negative correlation between mortality rate and tissue health exists.  The linear regression line below highlights the relationship.  I use an ANOVA test to confirm the regression model is statistically significant. 
 
 <br>
 
@@ -688,16 +657,14 @@ ggplot(acer4model, aes(x = mortality_rate, y = avg_health)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
-<br>
 
 ### Acer Portfolio Analysis
-<br>
 
-The goals are Reef Renewal Bonaire are to successfully outplant as many corals as possible but also to ensure new reefs are genomicaly diverse.  Thus, the driving question is how to achieve both goals with maximial efficiency of time and resources.  One strategy could be to plant an equal number of each genotype; however, the data shows that not all genotypes are equally resilient.  As a result, I propose building a weighted portfolio of genotypes in the same manor as one might build a financial portfolio of investments.
+The goals of Reef Renewal Bonaire are to successfully outplant as many corals as possible but also to ensure new reefs are genomicaly diverse.  Thus, the driving question is how to achieve both goals with maximum efficiency of time and resources.  Though one strategy would be to outplant an equal number of corals from each genotype, the data shows that not all genotypes are equally resilient.  Because of this, inefficiencies are introduced.  Therefore, I propose building a weighted portfolio of genotypes in the same manor as one might build a financial portfolio of investments.
 
-In typical portfolio analysis, the primary factors of consideration are the return on investment for each account and the standard distribution of returns (risk).  From these factors, an optimal basket of accounts is selected to achieve the desired portfolio goals.  In a portfolio of genotypes, I propose using the inverse mortality rate as the return on investment.  For example, geno #1 has an average mortality rate of 3.11%; therefore, a 96.89% survival rate (return on investment).  Similarly, geno #3 has a 21.54% average mortality rate and so there is a 78.46% average return.  The standard deviation of returns is then calculated for each genomic group of observations as a measure of risk.
+In typical portfolio analysis, the primary factors of consideration are the return on investment for each account and the risk (typically, the standard deviation of average returns).  From these factors, an optimal basket of accounts is selected to achieve the desired portfolio goals.  In a portfolio of genotypes, I propose using the inverse mortality rate (the survival rate) as the return on investment.  For example, geno #1 has an average mortality rate of 3.11%; therefore, a 96.89% survival rate is the return on investment.  Similarly, geno #3 has a 21.54% average mortality rate and so there is a 78.46% average return.  The standard deviation of the average returns is then calculated for each genomic group as a measure of risk.
 
-Having a sufficiently large sample size to calculate accurate returns and standard deviations is important.  Below, I have plotted the distribution of observations to visualize the raw sample size of each genotype.  
+Below, I have plotted the distribution of observations to visualize the raw sample size of each genotype.  
 
 <br>
 
@@ -737,8 +704,6 @@ acer.port.agg <- acer.port %>%
 
 ```
 
-<br>
-
 Additionally, the chart below shows the relationship between average return and standard deviation.
 
 <br>
@@ -764,11 +729,9 @@ plot_ly(acer.port.agg, x = ~sd,
 
 ```
 
-<br>
-
 #### Acer Bootstrapping
 
-Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
+Having a sufficiently large sample size to calculate accurate returns and standard deviations is important.  Because the sample size of some genotypes is limited, I use bootstrapping to artificially expand the sample size.  Each entire genotype group is randomly sampled 1000 times with replacement.  The result is a larger sample of the original data.  Through the Central Limit Theorem, the bootstrapped data approaches a normal distribution.  Thus, the distribution of returns are closer to the sample means and the risk factors (standard deviations) are more closely representative of the population.
 
 <br>
 
@@ -810,12 +773,13 @@ summary(acer.boot.agg[,4:6])
 #acer.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
   
 ```
-<br>
+
+
 #### Acer Portfolio
 
-Finally, the Portfolio Analytics' *optimize.portfolio* function is used on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested, long-only, where the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation of the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 40%.
-<br>
-The outputs below identify the optimal weights for each genotype and the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations the model considered.  
+I use the Portfolio Analytics' *optimize.portfolio* function on the bootstrapped data set to calculate the optimal weights of each genotype in the portfolio.  Portfolio specifications are added to ensure that 1)the portfolio is fully invested and long-only, whereby the sum of weights total to 1.0 (or 100%), 2)returns are defined as the mean survival rate and risk is defined as the standard deviation from the means, and 3)each genotype makes up a minimum of 1% of the total portfolio and a maximum of 25%.
+
+The outputs below identify the optimal weights for each genotype as well as the anticipated portfolio return and risk.  Additionally, the graph plots the optimal portfolio against all other iterations of the model.  
 
 <br>
 
@@ -853,14 +817,37 @@ chart.RiskReward(acer.opt, risk.col = "StdDev", return.col = "mean", chart.asset
 
 ```
 
+The model predictions are improvements on both survival rate (mean return) and risk (standard deviation of average returns).  A comparison between the existing values and the optimized portfolio is below.  The optimized portfolio model suggests that improvements to both survival rate and risk can be made by following the optimal portfolio weights for future outplantings.  
+
 <br>
+
+```{r acer portfolio improvements}
+
+opt.table <- c(acer.opt$opt_values$mean, acer.opt$opt_values$StdDev[1])
+
+acer.comparison <- acer.boot.agg %>%
+  summarize(mean = mean(avg_returns),
+            StdDev = mean(sd)) %>%
+  bind_rows(opt.table) %>% 
+  t() %>% 
+  as.tibble() %>%
+  mutate(change = abs(V2 - V1))
+
+
+acer.comparison <- as.data.frame(acer.comparison)
+colnames(acer.comparison) <- c("Current Portfolio", "Optimal Portfolio", "Improvement")
+rownames(acer.comparison) <- c("Acer Survival Rate", "Acer Risk")
+acer.comparison <- round(acer.comparison, 4) * 100
+
+kable(acer.comparison)
+
+```
 
 ## Species: Apal
 
+The Apal coral speices, commonly known as Elkhorn coral, has been outplanted at the following sites: Carl's Hill, Knife (subsites A-C), Oil Slick Leap, and South Bay II.
 
-The Apal speices, commonly known as Elkhorn coral, has been outplanted at the following sites: Carl's Hill, Knife I (subsites A-C), Oil Slick Leap, and South Bay II.
-
-The Carl's Hill, Knife IB, and Knife IC surveys were taken three- and six-months after outplanting.  Data was provided from one-, five, and six-month surveys for Knife IA.  Data from Oil Slick Leap was collected one-, seven-, and 13-months after outplanting, and the Southbay II data was collected at a half-month and 18 months from outplanting.
+The Carl's Hill, Knife B, and Knife C surveys were taken three- and six-months after outplanting.  Data was provided from one-, five-, and six-month surveys for Knife A.  Data from Oil Slick Leap was collected one-, seven-, and 13-months after outplanting, and the Southbay II data was collected at one half-month and 18 months from outplanting.
 
 <br>
 
@@ -893,7 +880,8 @@ apal_all$duration <- apal_all$duration %>% str_remove_all("M") %>% as.numeric()
 
 ### Apal Summary
 
-Below highlights the distribution of data collected.
+Below is a summary of the distribution of data collected.
+
 <br>
 
 ```{r plotting distribution of apal_all data}
@@ -910,9 +898,7 @@ apal_all %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-<br>
-
-The table below lists summary statistics for each Apal site.
+The table below contains summary statistics for each Apal site.
 
 <br>
 
@@ -935,13 +921,11 @@ apal_latest %>%
 
 ```
 
-<br>
-
-### Apal Mortality Rate
+#### Apal Mortality Rate
 
 The plots below highlight differences on the genomic level.  As with the Acer data, when multiple surveys were provided for a site, the latest (most recent) data was used.  
 
-Genos #16, #17, and #22 have the highest mortality rates.  Unlike the Acer date, these genos do not  correspond with the average tissue health statistics. Conversely, genos #9-10, and #13 have performed better than the rest.  
+Genos #16, #17, and #22 have the highest mortality rates.  Unlike the Acer date, these genos do not clearly correspond with the average tissue health statistics. Conversely, genos #9-10, and #13 have performed better than the rest.  
 
 <br>
 
@@ -969,10 +953,9 @@ ggplotly(apal_mortality.plot, tooltip = "text")
 
 ```
 
-<br>
-As with the Acer data, I filtered the Apal data to sites with both three- and six-month surveys (Carl's Hill, Knife IB and Knife IC) and plotted the change in mortality rate over time.  
+As with the Acer data, I filter the Apal data to sites with both three- and six-month surveys (Carl's Hill, Knife B and Knife C) and plotted the change in mortality rate over time.  
 
-It should be noted that instances in which mortality decreased also correspond with a decrease in sample size.  For example, the three-month surveys of geno #23 shows a total of 20 outplanted observations; however the six-month surveys show a total of only 10 outplanted observations.  It appears that not all clusters were re-surveyed.
+It should be noted that instances in which the mortality decreased also correspond with a decrease in sample size.  For example, the three-month surveys of geno #23 show a total of 20 outplanted observations; however the six-month surveys show a total of only 10 outplanted observations.  It appears that not all clusters were re-surveyed.  Therefore, the comparison over time is not a perfect comparison of the same samples.
 
 <br>
 
@@ -1005,10 +988,7 @@ apal_comp2 %>%
 
 ```
 
-<br>
-
-Separating the mortality rate findings by site reveals which site have performed better than others.  Genos #6-11 have more stable mortality rates across site than, say, genos #2, 19, and 22.
-
+Separating the mortality rate findings by site reveals which site have performed better than others.  Genos #6-11 have more stable mortality rates across sites than, say, genos #2, 19, and 22.
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
 
@@ -1028,7 +1008,7 @@ apal_latest %>%
           y = ~mortality_rate, 
           color = ~site, 
           hoverinfo = "text", 
-          text = ~paste0("Site: ", site, "<br>",
+          hovertext = ~paste0("Site: ", site, "<br>",
                          "Geno: ",geno, "<br>", 
                          "Mortality Rate: ", round(mortality_rate, 2), "%")) %>%
     add_bars(width = 0.5, position = "jitter") %>%
@@ -1039,9 +1019,9 @@ apal_latest %>%
             plot_bgcolor = "whitesmoke")
 
 ```
+#### Apal Tissue Health
 
-<br>
-
+The average tissue health for the Apal species is slightly higher than the Acer species.  Genos #2, #8, and #14 have not performed as well as others; however, the remaining genos are more tightly grouped, excluding outliers.
 
 <br>
 
@@ -1061,9 +1041,6 @@ plot_ly(apal_health.plot,
   hide_legend()
 
 ```
-
-<br>
-
 Filtering the breakdown of average tissue health by geno and by site helps to identify the distribution of observations by geno.  Oil Slick Leap has the most healthy distribution of corals, while Carl's Hill and Knife A appear more widely distributed.
 <br>
 *Note: clicking on the legend names allows you to filter the chart.*
@@ -1090,9 +1067,7 @@ apal_latest %>%
 
 ```
 
-<br>
-
-As with the Acer data, a negative correlation between mortality rate and tissue health exists.  The linear regression line highlights the relationship. Again, I use an ANOVA test to confirm the model is statistically significant. 
+As with the Acer data, a negative correlation between mortality rate and tissue health exists.  The linear regression line highlights this relationship. The ANOVA test confirms this model is also statistically significant. 
 
 <br>
 
@@ -1124,12 +1099,10 @@ ggplot(apal4model, aes(x = mortality_rate, y = avg_health)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
-<br>
 
 ### Apal Portfolio Analysis
-<br>
 
-The process to model the Apal portfolio is the same as for the Acer species.  The raw data is reviewed, bootstrapped, and modeled with the same portfolio weight requirements.
+The process for modeling the Apal portfolio is the same as for the Acer data.  The raw data is reviewed, bootstrapped, and modeled with the same portfolio weight requirements.
 
 <br>
 
@@ -1169,9 +1142,7 @@ apal.port.agg <- apal.port %>%
 
 ```
 
-<br>
-
-The chart below shows the relationship between average return and standard deviation.
+The relationship between average return and standard deviation follows a more gentle slope than the Acer data.
 
 <br>
 
@@ -1196,11 +1167,9 @@ plot_ly(apal.port.agg, x = ~sd,
 
 ```
 
-<br>
-
 #### Apal Bootstrapping
 
-Again, via the Central Limit Theorem, the bootstrapped data approaches a more normal distribution.  Thus, the average returns closely resemble the sample means, but the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
+Again, via the Central Limit Theorem, the bootstrapped data approaches a normal distribution.  Thus, the distribution of returns closely resemble the sample means and the risk factors (standard deviations) used for portfolio analysis are more closely representative of the population.
 
 <br>
 
@@ -1242,10 +1211,11 @@ summary(apal.boot.agg[,4:6])
 #apal.boot %>% ggplot(aes(x = returns)) + geom_histogram() + facet_trelliscope(~geno)
   
 ```
-<br>
+
 #### Apal Portfolio
 
-The same portfolio constraints and objectives are used for the Apal data.  
+The same portfolio constraints and objectives are used for the Apal data.  The portfolio is constructed with a full long-only requirement; weights are set to a minimum of 1% and a maximum of 25%.
+
 <br>
 
 ```{r apal portfolio analysis}
@@ -1285,5 +1255,35 @@ chart.RiskReward(apal.opt, risk.col = "StdDev", return.col = "mean", chart.asset
 
 ```
 
+The result of the optimized portfolio suggests that improvements to survival rate and risk can be made to future outplantings.  
 
-## Conclusions
+<br>
+
+```{r apal portfolio improvements}
+
+apal.opt.table <- c(apal.opt$opt_values$mean, apal.opt$opt_values$StdDev[1])
+
+apal.comparison <- apal.boot.agg %>%
+  summarize(mean = mean(avg_returns),
+            StdDev = mean(sd)) %>%
+  bind_rows(apal.opt.table) %>%
+  t() %>% 
+  as.tibble() %>%
+  mutate(change = abs(V2 - V1))
+
+apal.comparison <- as.data.frame(apal.comparison)
+colnames(apal.comparison) <- c("Current Portfolio", "Optimal Portfolio", "Improvement")
+rownames(apal.comparison) <- c("Apal Survival Rate", "Apal Risk")
+apal.comparison <- round(apal.comparison, 4) * 100
+
+kable(apal.comparison)
+
+```
+
+
+## Conclusion
+
+Our ability to propagate and grow new coral reef systems is a vital piece in the fight to manage our changing climate and slow the ill-effects of pollution.  Yet at this time, coral reef restoration is largely under valued and under funded by much of the world.  While maintaining genomic diversity is, and should be, an important aspect of fostering healthy reefs, the realities and constraints of resources cannot be ignored.  Outplanting new reefs must be done with maximum efficiency.  
+The genomic portfolio I propose is one way in which organizations may optimize their resources to build reefs with a new level of efficiency.  The models above show that improvements to overall reef survival rates are possible with decreased risk.  Additionally, the models do not consider growth rates and natural reproduction cycles of each species.  This information could potentially yield another dimension to the model by which a long term diversity strategy could be developed.  While more research is clearly needed for data collection and model tuning, a 1% improvement today has the potential to grow exponentially.  As in finance, coral restoration has the ability to grow from its own gains.  
+
+
