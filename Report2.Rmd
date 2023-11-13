@@ -10,6 +10,33 @@ output:
       collapsed: FALSE
 ---
 
+![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
+
+## Summary
+
+Coral reefs are a bellwether for the health of the oceans and provide an important leading indicator for the effects of climate change. They are also under intense pressure.  
+
+Organizations around the world are working on studying and building up coral reefs. Their goals are to stabilize their territories, while improving their health and resilience. Yet, coral reef restoration is largely under-valued and under-funded by much of the world.  The ability to propagate and grow new coral reefs is a vital tool in the fight to manage our changing climate.  With limited resources, constraints cannot be ignored.  Outplanting new reefs must be done with maximum efficiency.  
+
+This report attempts to demonstrate an innovative application of financial portfolio analysis to construct a genomic portfolio from which organizations may optimize their resources and outplant new reefs with increased efficiency.  The models developed for two coral species show that improvements to overall reef survival rates are possible when the proportions of genotypes are weighted to achieve the desired portfolio goals.  The models suggest that immediate gains can be made.  Further analysis will support hypertuning the models and the long-term success of the reefs.
+
+## Methodology
+
+_Approach:_ Initial analysis adheres to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* 
+
+_Data:_ All data was provided by Reef Renewal Bonaire (RRB).  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided from detailed underwater surveys of the outplanted reefs  
+
+_Coral cover percentage_ is calculated as (total coral area / eco-footprint) * 100.
+
+_Mortality rates_ are a standard calculation of (corals present - dead corals) / corals outplanted.
+
+_Average tissue health_ is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
+
+_Calculations and visualizations_ are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to GitHub.
+
+[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
+
+
 ```{r global settings, setup, include=FALSE}
 library(knitr) #global settings
 opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center')
@@ -330,33 +357,6 @@ x %>% rename("Species" = species,
 }
 
 ```
-
-
-![](/Users/tadgemcwilliams/Documents/Data Science/Reef Renewal Bonaire/RRFB/Carl's Hill_IG.jpg)
-
-## Summary
-
-Coral reefs are a bellwether for the health of the oceans and provide an important leading indicator for the effects of climate change. They are also under intense pressure.  
-
-Organizations around the world are working on studying and building up coral reefs. Their goals are to stabilize their territories, while improving their health and resilience. Yet, coral reef restoration is largely under-valued and under-funded by much of the world.  The ability to propagate and grow new coral reefs is a vital tool in the fight to manage our changing climate.  With limited resources, constraints cannot be ignored.  Outplanting new reefs must be done with maximum efficiency.  
-
-This report attempts to demonstrate an innovative application of financial portfolio analysis to construct a genomic portfolio from which organizations may optimize their resources and outplant new reefs with increased efficiency.  The models developed for two coral species show that improvements to overall reef survival rates are possible when the proportions of genotypes are weighted to achieve the desired portfolio goals.  The models suggest that immediate gains can be made.  Further analysis will support hypertuning the models and the long-term success of the reefs.
-
-## Methodology
-
-_Approach:_ Initial analysis adheres to the guidance proposed by the National Oceanic & Atmospheric Association (NOAA) in its September 2020 technical memorandum *Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local Ecosystem Scales.* 
-
-_Data:_ All data was provided by Reef Renewal Bonaire (RRB).  The ecological footprint data was collected from photomosaics and traditional underwater surveying methods.  The site-specific data was provided from detailed underwater surveys of the outplanted reefs  
-
-_Coral cover percentage_ is calculated as (total coral area / eco-footprint) * 100.
-
-_Mortality rates_ are a standard calculation of (corals present - dead corals) / corals outplanted.
-
-_Average tissue health_ is calculated as a weighted average of five tissue-health categories.  Corals are partitioned into tissue health groups of 1-25%, 26-50%, 51-75%, 76-99%, and 100%.  The central point of each category (12.5%, 37.5%, 62.5%, 87%, and 100%) is used to calculate the average tissue health.  This calculation does not include dead observations or those with 0% tissue health.[^1]
-
-_Calculations and visualizations_ are performed using R.  R packages for this project include *knitr*, *readxl*, *tidyverse*, *plotly*, *flextable*, and *PortfolioAnalytics*.  The report is formatted in Markdown, and all versions have been pushed to GitHub.
-
-[^1]: Goergen, E.A., Schopmeyer, S., Moulding, A.L., Moura, A., Kramer, P., and Viehman, T.S. 2020. Coral Reef Restoration Monitoring Guide: Methods to Evaluate Restoration Success From Local to Ecosystem Scales. NOAA Technical Memorandum NOS NCCOS 279. Silver Spring, MD. 158 pp. https://doi.org/10.25923/xndz-h538
 
 ## Eco-Footprint
 
