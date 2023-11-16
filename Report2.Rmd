@@ -39,7 +39,7 @@ _Calculations and visualizations_ are performed using R.  R packages for this pr
 
 ```{r global settings, setup, include=FALSE}
 library(knitr) #global settings
-opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center')
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = 'center')
 ```
 
 ```{r, load libraries, include=FALSE}
