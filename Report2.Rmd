@@ -58,7 +58,7 @@ library(PortfolioAnalytics)
 ```
 
 ```{r, loading data}
-setwd("~/Documents/Data Science/Reef Renewal Bonaire")
+setwd("~/Documents/Data Science/Reef Renewal Bonaire/Data")
 
 ###Monitoring Summary
 ltsummary <- read_excel("Monitoring Summary.xlsx", 
