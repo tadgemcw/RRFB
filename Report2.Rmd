@@ -49,7 +49,6 @@ library(pander)
 library(flextable)
 library(rempsyc)
 library(RColorBrewer)
-#display.brewer.all(colorblindFriendly = TRUE)
 library(viridisLite)
 library(viridis)
 library(plotly)
@@ -60,7 +59,7 @@ library(PortfolioAnalytics)
 ```{r, loading data}
 setwd("~/Documents/Data Science/Reef Renewal Bonaire/Data")
 
-###Monitoring Summary
+# Monitoring Summary
 ltsummary <- read_excel("Monitoring Summary.xlsx", 
                     sheet = 2, 
                     range = 'A3:L28',
@@ -361,7 +360,7 @@ x %>% rename("Species" = species,
 ## Eco-Footprint
 
 ```{r, foramtting Ltsummary}
-### Removing NAs  
+# Removing NAs  
 ltsummary <- ltsummary %>% select(-subsite) %>% drop_na(eco_footprint)
 
 ```
@@ -458,6 +457,7 @@ acer_all %>%
        fill = "Survey Month",
        title="Distribution of Acer Data") +
   theme(plot.title = element_text(hjust = 0.5))
+
 ```
 
 
@@ -521,6 +521,7 @@ Below, I isolate the data for sites with both three- and six-month surveys (Punt
 <br>
 
 ```{r acer 3- to 6-month mortality}
+
 comparison_sites <- c("Punt Vierkant", "Yellowman A", "Yellowman B")
 
 acer_comp1 <- acer_all %>%
